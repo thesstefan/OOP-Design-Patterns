@@ -1,5 +1,4 @@
 #include <iostream>
-#define LINUX
 
 class Widget {
     public:
@@ -83,9 +82,9 @@ class Screen {
 int main() {
     Factory *factory;
 
-#ifdef LINUX
+#ifdef __linux__
     factory = new LinuxFactory;
-#else
+#elif
     factory = new WindowsFactory;
 #endif
 
