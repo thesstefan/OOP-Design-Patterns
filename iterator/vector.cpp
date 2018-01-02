@@ -1,7 +1,9 @@
 #include <iostream>
 
-//#include "iterator.h"
+#include "iterator.h"
 #include "vector.h"
+
+template class Vector<int>;
 
 template <typename Item>
 Vector<Item>::Vector() {

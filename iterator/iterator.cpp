@@ -3,6 +3,8 @@
 #include "vector.h"
 #include "iterator.h"
 
+template class VectorIterator<int>;
+
 template <typename Item>
 VectorIterator<Item>::VectorIterator(Vector<Item> *vector) {
     this->vector = vector;
@@ -28,5 +30,5 @@ Item VectorIterator<Item>::current_item() const {
     if (this->is_done())
         std::cout << "Iterator is out of bounds" << std::endl;
 
-    return this->vector[this->current];
+    return (*this->vector)[this->current];
 }

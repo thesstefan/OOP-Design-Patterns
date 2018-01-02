@@ -10,8 +10,6 @@ class Iterator {
         virtual void next() = 0;
         virtual bool is_done() const = 0;
         virtual Item current_item() const = 0;
-    protected:
-        Iterator();
 };
 
 template <typename Item>
