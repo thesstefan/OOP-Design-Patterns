@@ -12,9 +12,6 @@ int main() {
     for (Vector<int>::Iterator it = vector->begin(); it != vector->end(); it++)
         std::cout << *it << std::endl;
 
-    for (auto p : vector)
-        std::cout << p << std::endl;
-
     return 0;
 }
 
