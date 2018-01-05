@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "iterator.h"
 #include "vector.h"
 
 template class Vector<int>;
@@ -21,12 +20,12 @@ Vector<Item>::Vector(unsigned int size) {
 
 template <typename Item>
 Vector<Item>::~Vector() {
-    delete[] buffer;
+    delete[] this->buffer;
 }
 
 template <typename Item>
-Item& Vector<Item>::operator[] (unsigned int index) {
-    return buffer[index];
+Item& Vector<Item>::operator[](unsigned int index) {
+    return this->buffer[index];
 }
 
 template <typename Item>
@@ -69,10 +68,104 @@ void Vector<Item>::push_back(const Item &item) {
         this->buffer[this->size++] = item;
 }
 
-/*
 template <typename Item>
-void Vector<Item>::print(VectorIterator<Item> &iterator) {
-    for (iterator.first(); iterator.is_done() != 0; iterator.next())
-        std::cout << iterator.current_item() << std::endl;
+typename Vector<Item>::Iterator Vector<Item>::begin() {
+    return Vector<Item>::Iterator(this->buffer);
 }
-*/
+
+template <typename Item>
+typename Vector<Item>::Iterator Vector<Item>::end() {
+    return Vector<Item>::Iterator(this->buffer + this->size);
+}
+
+template <typename Item>
+Vector<Item>::Iterator::Iterator(Item *buffer) {
+    this->buffer = buffer;
+}
+
+template <typename Item>
+typename Vector<Item>::Iterator Vector<Item>::Iterator::operator++() {
+    Iterator iterator = *this;
+
+    this->buffer++;
+
+    return iterator;
+}
+
+template <typename Item>
+typename Vector<Item>::Iterator Vector<Item>::Iterator::operator++(int) {
+    this->buffer++;
+
+    return *this;
+}
+
+template <typename Item>
+Item& Vector<Item>::Iterator::operator*() {
+    return *buffer;
+}
+
+template <typename Item>
+Item* Vector<Item>::Iterator::operator->() {
+    return buffer;
+}
+
+template <typename Item>
+bool Vector<Item>::Iterator::operator==(const Iterator &iterator) {
+    return buffer == iterator.buffer;
+}
+
+template <typename Item>
+bool Vector<Item>::Iterator::operator!=(const Iterator &iterator) {
+    return buffer != iterator.buffer;
+}
+
+template <typename Item>
+typename Vector<Item>::ConstIterator Vector<Item>::cbegin() {
+    return Vector<Item>::ConstIterator(this->buffer);
+}
+
+template <typename Item>
+typename Vector<Item>::ConstIterator Vector<Item>::cend() {
+    return Vector<Item>::ConstIterator(this->buffer + this->size);
+}
+
+template <typename Item>
+Vector<Item>::ConstIterator::ConstIterator(Item *buffer) {
+    this->buffer = buffer;
+}
+
+template <typename Item>
+typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator++() {
+    ConstIterator iterator = *this;
+
+    this->buffer++;
+
+    return iterator;
+}
+
+template <typename Item>
+typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator++(int) {
+    this->buffer++;
+
+    return *this;
+}
+
+template <typename Item>
+const Item& Vector<Item>::ConstIterator::operator*() {
+    return *buffer;
+}
+
+template <typename Item>
+const Item* Vector<Item>::ConstIterator::operator->() {
+    return buffer;
+}
+
+template <typename Item>
+bool Vector<Item>::ConstIterator::operator==(const ConstIterator &iterator) {
+    return buffer == iterator.buffer;
+}
+
+template <typename Item>
+bool Vector<Item>::ConstIterator::operator!=(const ConstIterator &iterator) {
+    return buffer != iterator.buffer;
+}
