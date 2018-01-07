@@ -40,14 +40,11 @@ bool Map<Key, Value>::find(const Key &key) {
 template <typename Key, typename Value>
 bool Map<Key, Value>::insert(const Pair<Key, Value> &pair) {
     if (this->find(pair.first) == false) {
-    std::cout << "Added " << pair.first << " " << pair.second << std::endl;
         this->keys->push_back(pair.first);
         this->values->push_back(pair.second);
 
         return true;
     }
-
-    std::cout << "Not added " << pair.first << " " << pair.second << std::endl;
 
     return false;
 }
