@@ -3,6 +3,7 @@
 #include "vector.h"
 
 template class Vector<int>;
+template class Vector<char>;
 
 template <typename Item>
 Vector<Item>::Vector() {
