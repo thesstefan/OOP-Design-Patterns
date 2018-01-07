@@ -1,16 +1,18 @@
 #include <iostream>
 
 #include "vector.h"
+#include "pair.h"
+#include "map.h"
 
 int main() {
-    Vector<int> *vector = new Vector<int>(10);
+    Map<char, int> *map = new Map<char, int>();
 
-    vector->push_back(10);
-    vector->push_back(14);
-    vector->push_back(20);
+    map->insert(Pair<char, int>('a', 10));
+    map->insert(Pair<char, int>('b', 50));
+    map->insert(Pair<char, int>('a', 30));
+    map->insert(Pair<char, int>('c', 20));
 
-    for (Vector<int>::Iterator it = vector->begin(); it != vector->end(); it++)
-        std::cout << *it << std::endl;
+    std::cout << map->size() << std::endl;
 
     return 0;
 }
