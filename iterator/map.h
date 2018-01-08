@@ -3,26 +3,31 @@
 
 template <typename Key, typename Value>
 class Map {
-    private:
+    protected:
         Vector<Key> *keys;
         Vector<Value> *values;
 
     public:
-        /*
         class Iterator {
             private:
-                Iterator(Key *key_buffer, Value *value_buffer);
+                typename Vector<Key>::Iterator key_it;
+                typename Vector<Value>::Iterator val_it;
+
+            public:
+                Iterator(typename Vector<Key>::Iterator key_it, typename Vector<Value>::Iterator val_it);
 
                 Iterator operator++();
                 Iterator operator++(int);
 
-                Value &operator*();
-                Value *operator->();
+                Pair<Key, Value> &operator*();
+                Pair<Key, Value> *operator->();
 
                 bool operator==(const Iterator &iterator);
                 bool operator!=(const Iterator &iterator);
         };
-        */
+
+        Iterator begin();
+        Iterator end();
 
         Map();
         ~Map();

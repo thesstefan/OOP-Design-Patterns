@@ -70,6 +70,11 @@ void Vector<Item>::push_back(const Item &item) {
 }
 
 template <typename Item>
+Vector<Item>::Iterator::Iterator() {
+    this->buffer = nullptr;
+}
+
+template <typename Item>
 typename Vector<Item>::Iterator Vector<Item>::begin() {
     return Vector<Item>::Iterator(this->buffer);
 }

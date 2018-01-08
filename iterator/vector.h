@@ -15,6 +15,7 @@ class Vector {
                 Item *buffer;
 
             public:
+                Iterator();
                 Iterator(Item *buffer);
 
                 Iterator operator++();
