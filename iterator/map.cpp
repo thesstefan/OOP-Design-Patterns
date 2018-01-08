@@ -48,6 +48,12 @@ bool Map<Key, Value>::insert(const Pair<Key, Value> &pair) {
 }
 
 template <typename Key, typename Value>
+Map<Key, Value>::Iterator::Iterator() {
+    this->key_it = nullptr;
+    this->val_it = nullptr;
+}
+
+template <typename Key, typename Value>
 Map<Key, Value>::Iterator::Iterator(typename Vector<Key>::Iterator key_it, typename Vector<Value>::Iterator val_it) {
     this->key_it = key_it;
     this->val_it = val_it;
@@ -92,6 +98,60 @@ bool Map<Key, Value>::Iterator::operator==(const Iterator &iterator) {
 
 template <typename Key, typename Value>
 bool Map<Key, Value>::Iterator::operator!=(const Iterator &iterator) {
+    return key_it != iterator.key_it && val_it != iterator.val_it;
+}
+
+template <typename Key, typename Value>
+Map<Key, Value>::ConstIterator::ConstIterator() {
+    this->key_it = nullptr;
+    this->val_it = nullptr;
+}
+
+template <typename Key, typename Value>
+Map<Key, Value>::ConstIterator::ConstIterator(typename Vector<Key>::ConstIterator key_it, typename Vector<Value>::ConstIterator val_it) {
+    this->key_it = key_it;
+    this->val_it = val_it;
+}
+
+template <typename Key, typename Value>
+typename Map<Key, Value>::ConstIterator Map<Key, Value>::cbegin() {
+    return Map<Key, Value>::ConstIterator(this->keys->cbegin(), this->values->cbegin());
+}
+
+template <typename Key, typename Value>
+typename Map<Key, Value>::ConstIterator Map<Key, Value>::cend() {
+    return Map<Key, Value>::ConstIterator(this->keys->cend(), this->values->cend());
+}
+
+template <typename Key, typename Value>
+typename Map<Key, Value>::ConstIterator Map<Key, Value>::ConstIterator::operator++(int) {
+    this->key_it++;
+    this->val_it++;
+
+    return *this;
+};
+
+template <typename Key, typename Value>
+const Pair<Key, Value>* Map<Key, Value>::ConstIterator::operator->() {
+    Pair<Key, Value> *pair = new Pair<Key, Value>(*(this->key_it), *(this->val_it));
+
+    return pair;
+}
+
+template <typename Key, typename Value>
+const Pair<Key, Value>& Map<Key, Value>::ConstIterator::operator*() {
+    Pair<Key, Value> *pair = new Pair<Key, Value>(*(this->key_it), *(this->val_it));
+    
+    return *pair;
+}
+
+template <typename Key, typename Value>
+bool Map<Key, Value>::ConstIterator::operator==(const ConstIterator &iterator) {
+    return key_it == iterator.key_it && val_it == iterator.val_it;
+}
+
+template <typename Key, typename Value>
+bool Map<Key, Value>::ConstIterator::operator!=(const ConstIterator &iterator) {
     return key_it != iterator.key_it && val_it != iterator.val_it;
 }
 

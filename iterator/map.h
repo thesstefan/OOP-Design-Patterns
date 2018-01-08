@@ -14,6 +14,7 @@ class Map {
                 typename Vector<Value>::Iterator val_it;
 
             public:
+                Iterator();
                 Iterator(typename Vector<Key>::Iterator key_it, typename Vector<Value>::Iterator val_it);
 
                 Iterator operator++();
@@ -26,8 +27,30 @@ class Map {
                 bool operator!=(const Iterator &iterator);
         };
 
+        class ConstIterator {
+            private:
+                typename Vector<Key>::ConstIterator key_it;
+                typename Vector<Value>::ConstIterator val_it;
+
+            public:
+                ConstIterator();
+                ConstIterator(typename Vector<Key>::ConstIterator key_it, typename Vector<Value>::ConstIterator val_it);
+
+                ConstIterator operator++();
+                ConstIterator operator++(int);
+
+                const Pair<Key, Value> &operator*();
+                const Pair<Key, Value> *operator->();
+
+                bool operator==(const ConstIterator &iterator);
+                bool operator!=(const ConstIterator &iterator);
+        };
+
         Iterator begin();
         Iterator end();
+
+        ConstIterator cbegin();
+        ConstIterator cend();
 
         Map();
         ~Map();

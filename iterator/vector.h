@@ -33,6 +33,7 @@ class Vector {
                 Item *buffer;
 
             public:
+                ConstIterator();
                 ConstIterator(Item *buffer);
 
                 ConstIterator operator++();

@@ -126,6 +126,11 @@ bool Vector<Item>::Iterator::operator!=(const Iterator &iterator) {
 }
 
 template <typename Item>
+Vector<Item>::ConstIterator::ConstIterator() {
+    this->buffer = nullptr;
+}
+
+template <typename Item>
 typename Vector<Item>::ConstIterator Vector<Item>::cbegin() {
     return Vector<Item>::ConstIterator(this->buffer);
 }
