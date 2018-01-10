@@ -14,7 +14,7 @@ Vector<Item>::Vector() {
 }
 
 template <typename Item>
-Vector<Item>::Vector(unsigned int size) {
+Vector<Item>::Vector(size_type size) {
     this->capacity = size;
     this->size = 0;
     this->buffer = new Item[size];
@@ -35,14 +35,14 @@ Vector<Item>& Vector<Item>::operator=(const Vector<Item> &other) {
 }
 
 template <typename Item>
-void Vector<Item>::assign(unsigned int count, const Item& value) {
+void Vector<Item>::assign(size_type count, const Item& value) {
     this->clear();
 
     while (this->size < count)
         this->push_back(value);
 }
 template <typename Item>
-Item& Vector<Item>::at(unsigned int index) {
+Item& Vector<Item>::at(size_type index) {
     if (index < 0 || index > this->size)
         throw OutOfRange("OutOfRange error in Vector::at()");
 
@@ -50,7 +50,7 @@ Item& Vector<Item>::at(unsigned int index) {
 }
 
 template <typename Item>
-Item& Vector<Item>::operator[](unsigned int index) {
+Item& Vector<Item>::operator[](size_type index) {
     return this->buffer[index];
 }
 
@@ -70,12 +70,12 @@ bool Vector<Item>::empty() const {
 }
 
 template <typename Item>
-unsigned int Vector<Item>::get_size() const {
+size_type Vector<Item>::get_size() const {
     return this->size;
 }
 
 template <typename Item>
-unsigned int Vector<Item>::get_capacity() const {
+size_type Vector<Item>::get_capacity() const {
     return this->capacity;
 }
 
@@ -183,7 +183,7 @@ void Vector<Item>::swap(Vector<Item> &other) {
 }
 
 template <typename Item>
-void Vector<Item>::resize(unsigned int count, const Item &value) {
+void Vector<Item>::resize(size_type count, const Item &value) {
     while (count != this->size) {
         if (count > this->size) 
             this->push_back(value);
