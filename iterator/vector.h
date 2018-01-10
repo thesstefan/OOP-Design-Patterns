@@ -3,9 +3,11 @@
 
 template <typename Item>
 class Vector {
+    typedef unsigned int size_type;
+
     protected:
-        unsigned int size;
-        unsigned int capacity;
+        size_type size;
+        size_type capacity;
 
         Item *buffer;
 
@@ -72,22 +74,22 @@ class Vector {
 
 
         Vector();
-        Vector(unsigned int size);
+        Vector(size_type size);
         ~Vector();
 
         Vector &operator=(const Vector &other);
-        void assign(unsigned int count, const Item &value);
+        void assign(size_type count, const Item &value);
 
-        Item &operator[] (unsigned int index);
-        Item& at(unsigned int index);
+        Item &operator[] (size_type index);
+        Item& at(size_type index);
 
         Item& front();
         Item& back();
 
         bool empty() const;
 
-        unsigned int get_size() const;
-        unsigned int get_capacity() const;
+        size_type get_size() const;
+        size_type get_capacity() const;
 
         Iterator begin();
         Iterator end();
@@ -107,7 +109,7 @@ class Vector {
         void pop_back();
 
         void swap(Vector &other);
-        void resize(unsigned int count, const Item &value);
+        void resize(size_type count, const Item &value);
 };
 
 #endif
