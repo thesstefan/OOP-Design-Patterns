@@ -1,25 +1,31 @@
 #include <iostream>
 
+#include "exception.h"
 #include "vector.h"
-#include "pair.h"
-#include "map.h"
+
+template <typename Item>
+void print(Vector<Item> &vector) {
+    std::cout << "Size : " << vector.get_size() << std::endl;
+    std::cout << "Capacity : " << vector.get_capacity() << std::endl;
+
+    for (auto it = vector.begin(); it != vector.end(); it += 1)
+        std::cout << *it << " ";
+
+    std::cout << std::endl;
+}
 
 int main() {
-    Map<char, int> *map = new Map<char, int>();
+    Vector<int> vector;
+    Vector<int> vector_2;
 
-    map->insert(Pair<char, int>('a', 10));
-    map->insert(Pair<char, int>('b', 50));
-    map->insert(Pair<char, int>('c', 30));
-    map->insert(Pair<char, int>('d', 30));
-    map->insert(Pair<char, int>('e', 30));
-    map->insert(Pair<char, int>('f', 30));
-    map->insert(Pair<char, int>('g', 30));
-    map->insert(Pair<char, int>('h', 20));
+    vector.push_back(10);
+    vector.push_back(20);
 
-    for (auto it = map->begin(); it != map->end(); it++) {
-        std::cout << it->first << " " << it->second << std::endl;
-    }
+    vector_2.push_back(10);
+    vector_2.push_back(30);
+
+    std::cout << std::boolalpha;
+    std::cout << (vector <= vector_2) << std::endl;
 
     return 0;
 }
-

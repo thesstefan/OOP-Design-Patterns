@@ -6,6 +6,8 @@
 template class Vector<int>;
 template class Vector<char>;
 
+typedef unsigned int size_type;
+
 template <typename Item>
 Vector<Item>::Vector() {
     this->capacity = 0;
@@ -191,7 +193,81 @@ void Vector<Item>::resize(size_type count, const Item &value) {
             this->pop_back();
     }
 }
-        
+
+template <typename Item>
+bool Vector<Item>::operator==(const Vector &other) const {
+    if (this->size != other.size)
+        return false;
+
+    for (auto it = this->cbegin(), other_it = other.cbegin(); it != this->cend() && other_it != this->cend(); it++, other_it++)
+       if (*it != *other_it)
+          return false;
+
+   return true;
+} 
+
+template <typename Item>
+bool Vector<Item>::operator!=(const Vector &other) const {
+    if (*this == other)
+        return false;
+
+    return true;
+}
+
+template <typename Item>
+int Vector<Item>::Compare::execute(typename Vector<Item>::ConstIterator first_1, typename Vector<Item>::ConstIterator end_1, typename Vector<Item>::ConstIterator first_2, typename Vector<Item>::ConstIterator end_2) {
+    auto it_1 = first_1;
+    auto it_2 = first_2;
+
+    for ( ; it_1 != end_1 && it_2 != end_2; it_1++, it_2++) {
+        std::cout << *it_1 << " " << *it_2 << std::endl;
+
+        if (*it_1 < *it_2)
+            return -1;
+        else if (*it_1 > *it_2)
+            return 1;
+    }
+
+    if (it_1 == end_1 && it_2 != end_2)
+        return -1;
+    else if (it_1 != end_1 && it_2 == end_2)
+        return 1;
+
+    return 0;
+}
+
+template <typename Item>
+bool Vector<Item>::operator<(const Vector &other) const {
+    if (Compare().execute(this->cbegin(), this->cend(), other.cbegin(), other.cend()) < 0)
+        return true;
+
+    return false;
+}
+
+template <typename Item>
+bool Vector<Item>::operator>(const Vector &other) const {
+    if (Compare().execute(this->cbegin(), this->cend(), other.cbegin(), other.cend()) > 0)
+        return true;
+
+    return false;
+}
+
+template <typename Item>
+bool Vector<Item>::operator<=(const Vector &other) const {
+    if (Compare().execute(this->cbegin(), this->cend(), other.cbegin(), other.cend()) <= 0)
+        return true;
+
+    return false;
+}
+
+template <typename Item>
+bool Vector<Item>::operator>=(const Vector &other) const {
+    if (Compare().execute(this->cbegin(), this->cend(), other.cbegin(), other.cend()) >= 0)
+        return true;
+
+    return false;
+}
+
 template <typename Item>
 Vector<Item>::Iterator::Iterator() {
     this->buffer = nullptr;
@@ -327,12 +403,12 @@ typename Vector<Item>::ConstIterator& Vector<Item>::ConstIterator::operator=(con
 }
 
 template <typename Item>
-typename Vector<Item>::ConstIterator Vector<Item>::cbegin() {
+typename Vector<Item>::ConstIterator Vector<Item>::cbegin() const {
     return Vector<Item>::ConstIterator(this->buffer);
 }
 
 template <typename Item>
-typename Vector<Item>::ConstIterator Vector<Item>::cend() {
+typename Vector<Item>::ConstIterator Vector<Item>::cend() const {
     return Vector<Item>::ConstIterator(this->buffer + this->size);
 }
 

@@ -72,12 +72,16 @@ class Vector {
                 bool operator!=(const ConstIterator &iterator);
         };
 
+        class Compare {
+            public:
+                int execute(ConstIterator first_1, ConstIterator end_1, ConstIterator first_2, ConstIterator end_2);
+        };
 
         Vector();
         Vector(size_type size);
         ~Vector();
 
-        Vector &operator=(const Vector &other);
+        Vector& operator=(const Vector &other);
         void assign(size_type count, const Item &value);
 
         Item &operator[] (size_type index);
@@ -94,8 +98,8 @@ class Vector {
         Iterator begin();
         Iterator end();
 
-        ConstIterator cbegin();
-        ConstIterator cend();
+        ConstIterator cbegin() const;
+        ConstIterator cend() const;
 
         bool alloc_memory_if_needed();
         void reserve(int capacity, bool copy);
@@ -110,6 +114,13 @@ class Vector {
 
         void swap(Vector &other);
         void resize(size_type count, const Item &value);
+
+        bool operator==(const Vector &other) const;
+        bool operator!=(const Vector &other) const;
+        bool operator<(const Vector &other) const;
+        bool operator>(const Vector &other) const;
+        bool operator>=(const Vector &other) const;
+        bool operator<=(const Vector &other) const;
 };
 
 #endif
