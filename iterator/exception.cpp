@@ -20,3 +20,4 @@ const char* Exception::what() const {
 
 OutOfRange::OutOfRange(const char *message) : Exception(message) {}
 BadAlloc::BadAlloc(const char *message) : Exception(message) {}
+Error::Error(const char *message) : Exception(message) {}

@@ -38,8 +38,8 @@ class Vector {
                 Item &operator*();
                 Item *operator->();
 
-                bool operator==(const Iterator &iterator);
-                bool operator!=(const Iterator &iterator);
+                bool operator==(const Iterator &iterator) const;
+                bool operator!=(const Iterator &iterator) const;
         };
 
         class ConstIterator {
@@ -65,11 +65,11 @@ class Vector {
                 ConstIterator operator+=(int x);
                 ConstIterator operator-=(int x);
 
-                const Item &operator*();
-                const Item *operator->();
+                const Item &operator*() const;
+                const Item *operator->() const;
 
-                bool operator==(const ConstIterator &iterator);
-                bool operator!=(const ConstIterator &iterator);
+                bool operator==(const ConstIterator &iterator) const;
+                bool operator!=(const ConstIterator &iterator) const;
         };
 
         class Compare {

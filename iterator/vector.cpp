@@ -126,22 +126,13 @@ void Vector<Item>::clear() {
 
 template <typename Item>
 typename Vector<Item>::Iterator Vector<Item>::insert(typename Vector<Item>::Iterator position, const Item& value) {
+    this->size++;
     this->alloc_memory_if_needed();
 
-    int copy = *position;
+    for (auto it = this->end() - 1; it != position; it--)
+        *it = *(it - 1);
+
     *position = value;
-
-    this->size++;
-
-    for (auto it = position + 1; it != this->end(); it++) {
-        int new_copy = *it;
-
-        *it = copy;
-
-        copy = new_copy;
-    }
-
-    return position;
 }
 
 template <typename Item>
@@ -373,12 +364,12 @@ Item* Vector<Item>::Iterator::operator->() {
 }
 
 template <typename Item>
-bool Vector<Item>::Iterator::operator==(const Iterator &iterator) {
+bool Vector<Item>::Iterator::operator==(const Iterator &iterator) const {
     return buffer == iterator.buffer;
 }
 
 template <typename Item>
-bool Vector<Item>::Iterator::operator!=(const Iterator &iterator) {
+bool Vector<Item>::Iterator::operator!=(const Iterator &iterator) const {
     return buffer != iterator.buffer;
 }
 
@@ -477,21 +468,21 @@ typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator-=(int
 }
 
 template <typename Item>
-const Item& Vector<Item>::ConstIterator::operator*() {
+const Item& Vector<Item>::ConstIterator::operator*() const {
     return *buffer;
 }
 
 template <typename Item>
-const Item* Vector<Item>::ConstIterator::operator->() {
+const Item* Vector<Item>::ConstIterator::operator->() const {
     return buffer;
 }
 
 template <typename Item>
-bool Vector<Item>::ConstIterator::operator==(const ConstIterator &iterator) {
+bool Vector<Item>::ConstIterator::operator==(const ConstIterator &iterator) const {
     return buffer == iterator.buffer;
 }
 
 template <typename Item>
-bool Vector<Item>::ConstIterator::operator!=(const ConstIterator &iterator) {
+bool Vector<Item>::ConstIterator::operator!=(const ConstIterator &iterator) const {
     return buffer != iterator.buffer;
 }

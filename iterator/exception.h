@@ -21,3 +21,8 @@ class BadAlloc : public Exception {
     public:
         BadAlloc(const char *message);
 };
+
+class Error : public Exception {
+    public:
+        Error(const char *message);
+};
