@@ -104,6 +104,8 @@ class Vector {
         bool alloc_memory_if_needed();
         void reserve(int capacity, bool copy);
 
+        Iterator find(const Item &item);
+
         void clear();
 
         Iterator insert(Iterator position, const Item &value);

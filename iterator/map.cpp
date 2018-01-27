@@ -3,27 +3,29 @@
 #include "vector.h"
 #include "exception.h"
 
+#include <iostream>
+
 template class Map<char, int>;
 
 template <typename Key, typename Value>
 Map<Key, Value>::Map() {
     this->keys = new Vector<Key>();
-    this->values = new Vector<Value>();
+    this->vals = new Vector<Value>();
 }
 
 template <typename Key, typename Value>
 Map<Key, Value>::~Map() {
     delete this->keys;
-    delete this->values;
+    delete this->vals;
 }
 
 template <typename Key, typename Value>
 Map<Key, Value>& Map<Key,Value>::operator=(const Map &other) {
     delete this->keys;
-    delete this->values;
+    delete this->vals;
 
     this->keys = other.keys;
-    this->values = other.values;
+    this->vals = other.vals;
 }
 
 template <typename Key, typename Value>
@@ -42,12 +44,31 @@ const Value& Map<Key, Value>::at(const Key &key) const {
     return this->find(key)->second;
 }
 
+template <typename Item, typename Iterator>
+unsigned int get_index(Iterator start, Iterator end, Item to_find) {
+    unsigned int index = 0;
+
+    for (auto it = start; it != end; it++, index++)
+        if (*it == to_find)
+            return index;
+
+#define NOT_FOUND -1
+    return NOT_FOUND;
+}
+
 template <typename Key, typename Value>
 Value& Map<Key, Value>::operator[](const Key &key) {
-    if (this->find(key) == this->end()); 
-        return this->insert(Pair<Key, Value>(key, Value())).first->second;
+    unsigned int index = get_index(this->keys->begin(), this->keys->end(), key);
 
-    return this->find(key)->second;
+    if (index == NOT_FOUND) {
+        this->insert(key, Value());
+
+        unsigned int new_index = get_index(this->keys->begin(), this->keys->end(), key);
+
+        return this->vals->operator[](new_index);
+    } 
+
+    return this->vals->operator[](index);
 }
 
 template <typename Key, typename Value>
@@ -63,36 +84,32 @@ unsigned int Map<Key, Value>::size() const {
 template <typename Key, typename Value>
 void Map<Key, Value>::clear() {
     this->keys->clear();
-    this->values->clear();
+    this->vals->clear();
 }
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::ConstIterator Map<Key, Value>::find(const Key &key) const {
-    int count = 0;
-    auto it = this->keys->cbegin();
+    auto it = this->cbegin();
 
-    for ( ; it != this->keys->cend() && *it != key; it++)
-        count++;
+    for ( ; it != this->cend() && it->first != key; it++);
 
-    return Map<Key, Value>::ConstIterator(it, this->values->cbegin() + count);
+    return it;
 }
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::Iterator Map<Key,Value>::find(const Key &key) {
-    int count = 0;
-    auto it = this->keys->begin();
+    auto it = this->begin();
 
-    for ( ; it != this->keys->end() && *it != key; it++)
-        count++;
-
-    return Map<Key, Value>::Iterator(it, this->values->begin() + count);
+    for ( ; it != this->end() && it->first != key; it++);
+        
+    return it;
 }
 
 template <typename Key, typename Value>
 unsigned int Map<Key, Value>::count(const Key &key) const {
     int count = 0;
 
-    for (auto it = this->lower_bound(key); it != this->cend(); it++) {
+    for (auto it = this->cbegin(); it != this->cend(); it++) {
         if (it->first == key)
             count++;
 
@@ -104,113 +121,37 @@ unsigned int Map<Key, Value>::count(const Key &key) const {
 }
 
 template <typename Key, typename Value>
-bool Map<Key, Value>::Compare::comp(const Key &first, const Key &second) const {
-    if (first < second)
-        return true;
+Pair<typename Map<Key, Value>::Iterator, bool> Map<Key, Value>::insert(const Key &key, const Value &val) {
+    if (this->find(key) == this->end()) {
+        this->keys->push_back(key);
+        this->vals->push_back(val);
 
-    return false;
-}
+        auto it = Map<Key, Value>::Iterator(this->keys->end() - 1, this->vals->end() - 1);
 
-template <typename Key, typename Value>
-bool Map<Key, Value>::Compare::equiv(const Key &first, const Key &second) const {
-    if (!comp(first, second) && !comp(second, first))
-        return true;
-
-    return false;
-}
-
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::lower_bound(const Key &key) {
-    auto it = this->begin();
-
-    for ( ; it != this->end() && Compare().comp(it->first, key); it++);
-
-    return it;
-}
-
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::lower_bound(const Key &key) const {
-    auto it = this->cbegin();
-
-    for ( ; it != this->cend() && Compare().comp(it->first, key); it++);
-
-    return it;
-}
-
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::upper_bound(const Key &key) {
-    auto it = this->begin();
-
-    for ( ; it != this->end() && (Compare().comp(it->first, key) || Compare().equiv(it->first, key)); it++);
-
-    return it;
-}
-
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::upper_bound(const Key &key) const {
-    auto it = this->cbegin();
-
-    for ( ; it != this->cend() && (Compare().comp(it->first, key) || Compare().equiv(it->first, key)); it++);
-
-    return it;
-}
-
-template <typename Key, typename Value>
-Pair<typename Map<Key, Value>::Iterator, bool> Map<Key, Value>::insert(const Pair<Key, Value> &pair) {
-    if (this->find(pair.first) == this->end()) {
-        auto it = this->keys->begin();
-        int position = 0;
-
-        for ( ; it != this->keys->end() && Compare().comp(pair.first, *it) != true; it++)
-            position++;
-
-        auto insert_key_it = this->keys->insert(it, pair.first);
-        auto insert_val_it = this->values->insert(this->values->begin() + position, pair.second);
-
-        return Pair<Map<Key, Value>::Iterator, bool>(Map<Key, Value>::Iterator(insert_key_it, insert_val_it), true);
+        return Pair<Map<Key, Value>::Iterator, bool>(it, true);
     }
 
-    return Pair<Map<Key, Value>::Iterator, bool>(this->find(pair.first), false);
+    return Pair<Map<Key, Value>::Iterator, bool>(this->find(key), false);
 }
 
+/*
 template <typename Key, typename Value>
-void Map<Key, Value>::erase(typename Map<Key, Value>::Iterator position) {
-     
+typename Map<Key, Value>::Iterator Map<Key, Value>::erase(typename Map<Key, Value>::Iterator position) {
+    auto key_erase_it = this->keys->erase(position.key_it);
+    auto val_erase_it = this->vals->erase(position.val_it);
+
+    return Map<Key, Value>::Iterator(key_erase_it, val_erase_it);
 }
-
-template <typename Key, typename Value>
-unsigned int Map<Key, Value>::erase(const Key &key) {
-    int count;
-
-    while (this->find(key) != this->end()) {
-        int position = 0;
-
-        for (auto it = this->keys->begin(); it != this->keys->end() && *it != key; it++)
-            position++;
-
-        if (*it == key) {
-            this->keys->erase(it);
-            this->values->erase(this->values->begin() + position);
-
-            count++:
-        }
-    }
-
-    return count;
-}
-
-template <typename Key, typename Value>
-void Map<Key, Value>::swap(Map<Key, Value> &other) {
-}
+*/
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::Iterator Map<Key, Value>::begin() {
-    return Map<Key, Value>::Iterator(this->keys->begin(), this->values->begin());
+    return Map<Key, Value>::Iterator(this->keys->begin(), this->vals->begin());
 }
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::Iterator Map<Key, Value>::end() {
-    return Map<Key, Value>::Iterator(this->keys->end(), this->values->end());
+    return Map<Key, Value>::Iterator(this->keys->end(), this->vals->end());
 }
 
 template <typename Key, typename Value>
@@ -323,12 +264,12 @@ typename Map<Key, Value>::ConstIterator& Map<Key, Value>::ConstIterator::operato
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::ConstIterator Map<Key, Value>::cbegin() const {
-    return Map<Key, Value>::ConstIterator(this->keys->cbegin(), this->values->cbegin());
+    return Map<Key, Value>::ConstIterator(this->keys->cbegin(), this->vals->cbegin());
 }
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::ConstIterator Map<Key, Value>::cend() const {
-    return Map<Key, Value>::ConstIterator(this->keys->cend(), this->values->cend());
+    return Map<Key, Value>::ConstIterator(this->keys->cend(), this->vals->cend());
 }
 
 template <typename Key, typename Value>

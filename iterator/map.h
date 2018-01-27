@@ -5,10 +5,12 @@ template <typename Key, typename Value>
 class Map {
     protected:
         Vector<Key> *keys;
-        Vector<Value> *values;
+        Vector<Value> *vals;
 
     public:
         class Iterator {
+            friend class Map;
+
             protected:
                 typename Vector<Key>::Iterator key_it;
                 typename Vector<Value>::Iterator val_it;
@@ -34,7 +36,9 @@ class Map {
         };
 
         class ConstIterator {
-            private:
+            friend class Map;
+
+            protected:
                 typename Vector<Key>::ConstIterator key_it;
                 typename Vector<Value>::ConstIterator val_it;
 
@@ -58,12 +62,6 @@ class Map {
                 bool operator!=(const ConstIterator &iterator) const;
         };
 
-        class Compare {
-            public:
-                bool comp(const Key &first, const Key &second) const;
-                bool equiv(const Key &first, const Key &second) const;
-        };
-
         Map();
         ~Map();
 
@@ -85,21 +83,18 @@ class Map {
 
         void clear();
 
-        Pair<Iterator, bool> insert(const Pair<Key, Value> &pair);
+        Pair<Iterator, bool> insert(const Key &key, const Value &val);
 
+        /*
         void erase(Iterator position);
         unsigned int erase(const Key &key);
+        */
 
         ConstIterator find(const Key &key) const;
         Iterator find(const Key &key);
 
-        Iterator lower_bound(const Key &key);
-        ConstIterator lower_bound(const Key &key) const;
-
-        Iterator upper_bound(const Key &key);
-        ConstIterator upper_bound(const Key &key) const;
-
         unsigned int count(const Key &key) const;
+        //Iterator erase(ConstIterator position);
 //        void erase(Iterator position);
 
 //        unsigned int count(const Key &key) const;

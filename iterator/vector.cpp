@@ -486,3 +486,14 @@ template <typename Item>
 bool Vector<Item>::ConstIterator::operator!=(const ConstIterator &iterator) const {
     return buffer != iterator.buffer;
 }
+
+template <typename Item>
+typename Vector<Item>::Iterator Vector<Item>::find(const Item &item) {
+    auto it = this->begin();
+
+    for ( ; it != this->end() && *it != item; it++)
+
+    return it;
+}
+
+
