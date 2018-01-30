@@ -1,93 +1,136 @@
 #include <iostream>
 
+#include "tree.h"
+
+template class Tree<int>;
+
 template <typename Type>
-class Tree {
-    private:
-        class Node {
-            public:
-                Type value;
+Tree<Type>::Node::Node(Type value) {
+    this->value = value;
 
-                Node *left;
-                Node *right;
+    this->left = nullptr;
+    this->right = nullptr;
+}
 
-                Node(Type value) {
-                    this->value = value;
+template <typename Type>
+Tree<Type>::Tree() {
+    this->root = nullptr;
+}
 
-                    this->left = nullptr;
-                    this->right = nullptr;
-                }
-        };
+template <typename Type>
+void Tree<Type>::real_delete(Tree<Type>::Node *leaf) {
+    if (leaf != nullptr) {
+        this->real_delete(leaf->left);
+        this->real_delete(leaf->right);
 
-        Node *root;
+        delete leaf;
+    }
+}
 
-        void delete_tree(Node *leaf) {
-            if (leaf != nullptr) {
-                this->delete_tree(leaf->left);
-                this->delete_tree(leaf->right);
+template <typename Type>
+Tree<Type>::~Tree() {
+    this->real_delete(this->root);
+}
 
-                delete leaf;
-            }
-        }
+template <typename Type>
+typename Tree<Type>::Node* Tree<Type>::real_insert(Tree<Type>::Node *leaf, Type value) {
+    if (leaf == nullptr)
+        leaf = new Node(value);
+    else if (value < leaf->value)
+        leaf->left = real_insert(leaf->left, value);
+    else if (value > leaf->value)
+        leaf->right = real_insert(leaf->right, value);
 
-        void insert(Type value, Node *leaf) {
-            if (value < leaf->value) {
-                if (leaf->left != nullptr)
-                    insert(value, leaf->left);
-                else
-                    leaf->left = new Node(value);
-            } else {
-                if (leaf->right != nullptr)
-                    insert(value, leaf->right);
-                else
-                    leaf->right = new Node(value);
-            }
-        }
+    return leaf;
+}
 
-        Node *search(Type value, Node *leaf) {
-            if (leaf != nullptr) {
-                if (value == leaf->value)
-                    return leaf;
+template <typename Type>
+void Tree<Type>::insert(Type value) {
+    this->root = this->real_insert(this->root, value);
+}
 
-                if (value < leaf->value)
-                    return this->search(value, leaf->left);
-                else
-                    return this->search(value, leaf->right);
-            } else
-                return nullptr;
-        }
+template <typename Type>
+typename Tree<Type>::Node* Tree<Type>::min(Tree<Type>::Node *leaf) {
+    if (leaf == nullptr)
+        return nullptr;
+    else if (leaf->left == nullptr)
+        return leaf;
+    else 
+        return min(leaf->left);
+}
 
-    public:
-        Tree() {
-            this->root = nullptr;
-        }
-
-        ~Tree() {
-            this->delete_tree(this->root);
-        }
-
-        void insert(Type value) {
-            if (this->root != nullptr)
-                this->insert(value, this->root);
-            else
-                this->root = new Node(value);
-        }
-
-        Node *search(Type value) {
-            return this->search(value, this->root);
-        }
-};
-
-int main() {
-    Tree<int> *tree = new Tree<int>();
-
-    tree->insert(100);
-
-    auto node = tree->search(100);
-
-    if (node == nullptr)
-        std::cout << "NULL" << std::endl;
+template <typename Type>
+typename Tree<Type>::Node* Tree<Type>::max(Tree<Type>::Node *leaf) {
+    if (leaf == nullptr)
+        return nullptr;
+    else if (leaf->right == nullptr)
+        return leaf;
     else
-        std::cout << node->value << std::endl;
+        return max(leaf->right);
+}
 
-    return 0;
+template <typename Type>
+typename Tree<Type>::Node* Tree<Type>::real_erase(Tree<Type>::Node *leaf, Type value) {
+    if (leaf == nullptr)
+        return nullptr;
+    else if (value < leaf->value)
+        leaf->left = real_erase(leaf->left, value);
+    else if (value > leaf->value)
+        leaf->right = real_erase(leaf->right, value);
+    else if (leaf->left && leaf->right) {
+        auto temp = min(leaf->right);
+
+        leaf->value = temp->value;
+        leaf->right = real_erase(leaf->right, leaf->value);
+    } else {
+        auto temp = leaf;
+
+        if (leaf->left == nullptr)
+            leaf = leaf->right;
+        else if (leaf->right == nullptr)
+            leaf = leaf->left;
+
+        delete temp;
+    }
+
+    return leaf;
+}
+
+template <typename Type>
+void Tree<Type>::erase(Type value) {
+    this->root = this->real_erase(this->root, value);
+}
+
+template <typename Type>
+typename Tree<Type>::Node* Tree<Type>::real_search(Tree<Type>::Node *leaf, Type value) {
+    if (leaf == nullptr || leaf->value == value)
+        return leaf;
+
+    if (value < leaf->value)
+        return real_search(leaf->left, value);
+
+    return real_search(leaf->right, value);
+}
+
+template <typename Type>
+typename Tree<Type>::Node* Tree<Type>::search(Type value) {
+    return this->real_search(this->root, value);
+}
+
+template <typename Type>
+void Tree<Type>::real_print(Tree<Type>::Node *leaf) {
+    if (leaf != nullptr) {
+        real_print(leaf->left);
+
+        std::cout << leaf->value << " ";
+
+        real_print(leaf->right);
+    }
+}
+
+template <typename Type>
+void Tree<Type>::print() {
+    this->real_print(root);
+
+    std::cout << std::endl;
 }
