@@ -10,16 +10,16 @@ typedef unsigned int size_type;
 
 template <typename Item>
 Vector<Item>::Vector() {
-    this->capacity = 0;
-    this->size = 0;
-    this->buffer = new Item[0];
+    this->capacity_ = 0;
+    this->size_ = 0;
+    this->buffer = nullptr;
 }
 
 template <typename Item>
 Vector<Item>::Vector(size_type size) {
-    this->capacity = size;
-    this->size = 0;
-    this->buffer = new Item[size];
+    this->capacity_ = size;
+    this->size_ = 0;
+    this->buffer = new Item[size_];
 }
 
 template <typename Item>
@@ -32,20 +32,20 @@ Vector<Item>& Vector<Item>::operator=(const Vector<Item> &other) {
     delete[] this->buffer;
 
     this->buffer = other.buffer;
-    this->size = other.size;
-    this->capacity = other.capacity;
+    this->size_ = other.size_;
+    this->capacity_ = other.capacity_;
 }
 
 template <typename Item>
 void Vector<Item>::assign(size_type count, const Item& value) {
     this->clear();
 
-    while (this->size < count)
+    while (this->size_ < count)
         this->push_back(value);
 }
 template <typename Item>
 Item& Vector<Item>::at(size_type index) {
-    if (index < 0 || index > this->size)
+    if (index < 0 || index > this->size_)
         throw OutOfRange("OutOfRange error in Vector::at()");
 
     return this->buffer[index];
@@ -58,39 +58,39 @@ Item& Vector<Item>::operator[](size_type index) {
 
 template <typename Item>
 Item& Vector<Item>::front() {
-    return this->buffer[0];
+    return *this->begin();
 }
 
 template <typename Item>
 Item& Vector<Item>::back() {
-    return this->buffer[this->size - 1];
+    return *(this->end() - 1);
 }
 
 template <typename Item>
 bool Vector<Item>::empty() const {
-    return this->size == 0;
+    return this->size_ == 0;
 }
 
 template <typename Item>
-size_type Vector<Item>::get_size() const {
-    return this->size;
+size_type Vector<Item>::size() const {
+    return this->size_;
 }
 
 template <typename Item>
-size_type Vector<Item>::get_capacity() const {
-    return this->capacity;
+size_type Vector<Item>::capacity() const {
+    return this->capacity_;
 }
 
 template <typename Item>
 void Vector<Item>::reserve(int capacity, bool copy) {
     Item *new_buffer = new Item[capacity];
-    this->capacity = capacity;
+    this->capacity_ = capacity;
 
     if (new_buffer == nullptr) 
         throw BadAlloc("Memory allocation error in Vector::reserve()");
 
     if (copy) {
-        for (int index = 0; index < this->size; index++)
+        for (int index = 0; index < this->size_; index++)
             new_buffer[index] = this->buffer[index];
 
         if (this->buffer != nullptr)
@@ -98,17 +98,17 @@ void Vector<Item>::reserve(int capacity, bool copy) {
     }
 
     this->buffer = new_buffer;
-    this->capacity = capacity;
+    this->capacity_ = capacity;
 }
 
 
 template <typename Item>
 bool Vector<Item>::alloc_memory_if_needed()  {
-    if (this->size == this->capacity) {
-        if (this->capacity == 0)
+    if (this->size_ == this->capacity_) {
+        if (this->capacity_ == 0)
             reserve(1, false);
         else
-            reserve(this->capacity * 2, true);
+            reserve(this->capacity_ * 2, true);
 
         return true;
     }
@@ -119,14 +119,14 @@ bool Vector<Item>::alloc_memory_if_needed()  {
 template <typename Item>
 void Vector<Item>::clear() {
     delete[] this->buffer;
-    this->size = 0;
+    this->size_ = 0;
 
-    this->buffer = new Item[this->capacity];
+    this->buffer = new Item[this->capacity_];
 }
 
 template <typename Item>
 typename Vector<Item>::Iterator Vector<Item>::insert(typename Vector<Item>::Iterator position, const Item& value) {
-    this->size++;
+    this->size_++;
     this->alloc_memory_if_needed();
 
     for (auto it = this->end() - 1; it != position; it--)
@@ -140,7 +140,7 @@ typename Vector<Item>::Iterator Vector<Item>::erase(typename Vector<Item>::Itera
     for (auto it = position; it != this->end() - 1; it++)
         *it = *(it + 1);
 
-    this->size--;
+    this->size_--;
 
     return position;
 }
@@ -149,14 +149,14 @@ template <typename Item>
 void Vector<Item>::push_back(const Item &item) {
     this->alloc_memory_if_needed();
 
-    this->buffer[this->size++] = item;
+    this->buffer[this->size_++] = item;
 }
 
 template <typename Item>
 void Vector<Item>::pop_back() {
     this->alloc_memory_if_needed();
 
-    this->size--;
+    this->size_--;
 }
 
 template <typename Item>
@@ -171,14 +171,14 @@ void swap_(Item &item_1, Item &item_2) {
 template <typename Item>
 void Vector<Item>::swap(Vector<Item> &other) {
     swap_(this->buffer, other.buffer);
-    swap_(this->size, other.size);
-    swap_(this->capacity, other.capacity);
+    swap_(this->size_, other.size_);
+    swap_(this->capacity_, other.capacity_);
 }
 
 template <typename Item>
 void Vector<Item>::resize(size_type count, const Item &value) {
-    while (count != this->size) {
-        if (count > this->size) 
+    while (count != this->size_) {
+        if (count > this->size_) 
             this->push_back(value);
         else
             this->pop_back();
@@ -187,7 +187,7 @@ void Vector<Item>::resize(size_type count, const Item &value) {
 
 template <typename Item>
 bool Vector<Item>::operator==(const Vector &other) const {
-    if (this->size != other.size)
+    if (this->size_ != other.size_)
         return false;
 
     for (auto it = this->cbegin(), other_it = other.cbegin(); it != this->cend() && other_it != this->cend(); it++, other_it++)
@@ -286,7 +286,7 @@ typename Vector<Item>::Iterator Vector<Item>::begin() {
 
 template <typename Item>
 typename Vector<Item>::Iterator Vector<Item>::end() {
-    return Vector<Item>::Iterator(this->buffer + this->size);
+    return Vector<Item>::Iterator(this->buffer + this->size_);
 }
 
 template <typename Item>
@@ -400,7 +400,7 @@ typename Vector<Item>::ConstIterator Vector<Item>::cbegin() const {
 
 template <typename Item>
 typename Vector<Item>::ConstIterator Vector<Item>::cend() const {
-    return Vector<Item>::ConstIterator(this->buffer + this->size);
+    return Vector<Item>::ConstIterator(this->buffer + this->size_);
 }
 
 template <typename Item>

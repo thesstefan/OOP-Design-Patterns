@@ -6,8 +6,8 @@ class Vector {
     typedef unsigned int size_type;
 
     protected:
-        size_type size;
-        size_type capacity;
+        size_type size_;
+        size_type capacity_;
 
         Item *buffer;
 
@@ -92,8 +92,8 @@ class Vector {
 
         bool empty() const;
 
-        size_type get_size() const;
-        size_type get_capacity() const;
+        size_type size() const;
+        size_type capacity() const;
 
         Iterator begin();
         Iterator end();
