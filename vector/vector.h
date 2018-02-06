@@ -1,5 +1,4 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#pragma once
 
 template <typename Item>
 class Vector {
@@ -22,24 +21,29 @@ class Vector {
                 Iterator& operator=(const Iterator &iterator);
 
                 Iterator operator++();
-                Iterator operator++(int x);
+                Iterator operator++(int);
 
                 Iterator operator--();
-                Iterator operator--(int x);
+                Iterator operator--(int);
 
-                Iterator operator+(int x);
-                Iterator operator-(int x);
+                Iterator operator+(ptrdiff_t x);
+                Iterator operator-(ptrdiff_t x);
 
-                ptrdiff_t operator-(const Iterator &iterator);
+                ptrdiff_t operator-(const Iterator &iterator) const;
 
-                Iterator operator+=(int x);
-                Iterator operator-=(int x);
+                Iterator operator+=(ptrdiff_t x);
+                Iterator operator-=(ptrdiff_t x);
 
                 Item &operator*();
                 Item *operator->();
 
                 bool operator==(const Iterator &iterator) const;
                 bool operator!=(const Iterator &iterator) const;
+
+                bool operator<(const Iterator &iterator) const;
+                bool operator>(const Iterator &iterator) const;
+                bool operator<=(const Iterator &iterator) const;
+                bool operator>=(const Iterator &iterator) const;
         };
 
         class ConstIterator {
@@ -57,26 +61,31 @@ class Vector {
                 ConstIterator operator++(int);
 
                 ConstIterator operator--();
-                ConstIterator operator--(int x);
+                ConstIterator operator--(int);
 
-                ConstIterator operator+(int x);
-                ConstIterator operator-(int x);
+                ConstIterator operator+(ptrdiff_t x);
+                ConstIterator operator-(ptrdiff_t x);
 
-                ptrdiff_t operator-(const ConstIterator &iterator);
+                ptrdiff_t operator-(const ConstIterator &iterator) const;
 
-                ConstIterator operator+=(int x);
-                ConstIterator operator-=(int x);
+                ConstIterator operator+=(ptrdiff_t x);
+                ConstIterator operator-=(ptrdiff_t x);
 
                 const Item &operator*() const;
                 const Item *operator->() const;
 
                 bool operator==(const ConstIterator &iterator) const;
                 bool operator!=(const ConstIterator &iterator) const;
+
+                bool operator<(const ConstIterator &iterator) const;
+                bool operator>(const ConstIterator &iterator) const;
+                bool operator<=(const ConstIterator &iterator) const;
+                bool operator>=(const ConstIterator &iterator) const;
         };
 
         class Compare {
             public:
-                int execute(ConstIterator first_1, ConstIterator end_1, ConstIterator first_2, ConstIterator end_2);
+                ptrdiff_t execute(ConstIterator first_1, ConstIterator end_1, ConstIterator first_2, ConstIterator end_2);
         };
 
         Vector();
@@ -143,6 +152,7 @@ class Vector {
 
         bool operator==(const Vector &other) const;
         bool operator!=(const Vector &other) const;
+
         bool operator<(const Vector &other) const;
         bool operator>(const Vector &other) const;
         bool operator>=(const Vector &other) const;
@@ -312,8 +322,6 @@ void Vector<Item>::reserve(size_t capacity, bool copy) {
 
     this->buffer = new_buffer;
     this->capacity_ = capacity;
-
-    std::cout << "CAPACITY IS NOW " << this->capacity_ << std::endl;
 }
 
 
@@ -329,6 +337,15 @@ bool Vector<Item>::alloc_memory_if_needed()  {
     }
 
     return false;
+}
+
+template <typename Item>
+typename Vector<Item>::Iterator Vector<Item>::find(const Item &item) {
+    auto it = this->begin();
+
+    for ( ; it != this->end() && *it != item; it++)
+
+    return it;
 }
 
 template <typename Item>
@@ -458,7 +475,7 @@ bool Vector<Item>::operator!=(const Vector &other) const {
 }
 
 template <typename Item>
-int Vector<Item>::Compare::execute(typename Vector<Item>::ConstIterator first_1, typename Vector<Item>::ConstIterator end_1, typename Vector<Item>::ConstIterator first_2, typename Vector<Item>::ConstIterator end_2) {
+ptrdiff_t Vector<Item>::Compare::execute(typename Vector<Item>::ConstIterator first_1, typename Vector<Item>::ConstIterator end_1, typename Vector<Item>::ConstIterator first_2, typename Vector<Item>::ConstIterator end_2) {
     auto it_1 = first_1;
     auto it_2 = first_2;
 
@@ -574,7 +591,7 @@ typename Vector<Item>::Iterator Vector<Item>::Iterator::operator--(int) {
 }
 
 template <typename Item>
-typename Vector<Item>::Iterator Vector<Item>::Iterator::operator+(int x) {
+typename Vector<Item>::Iterator Vector<Item>::Iterator::operator+(ptrdiff_t x) {
     auto iterator = *this;
 
     iterator.buffer += x;
@@ -583,7 +600,7 @@ typename Vector<Item>::Iterator Vector<Item>::Iterator::operator+(int x) {
 }
 
 template <typename Item>
-typename Vector<Item>::Iterator Vector<Item>::Iterator::operator-(int x) {
+typename Vector<Item>::Iterator Vector<Item>::Iterator::operator-(ptrdiff_t x) {
     auto iterator = *this;
 
     iterator.buffer -= x;
@@ -592,19 +609,19 @@ typename Vector<Item>::Iterator Vector<Item>::Iterator::operator-(int x) {
 }
 
 template <typename Item>
-ptrdiff_t Vector<Item>::Iterator::operator-(const typename Vector<Item>::Iterator& iterator) {
+ptrdiff_t Vector<Item>::Iterator::operator-(const typename Vector<Item>::Iterator& iterator) const {
     return this->buffer - iterator.buffer;
 }
 
 template <typename Item>
-typename Vector<Item>::Iterator Vector<Item>::Iterator::operator+=(int x) {
+typename Vector<Item>::Iterator Vector<Item>::Iterator::operator+=(ptrdiff_t x) {
     this->buffer += x;
 
     return *this;
 }
 
 template <typename Item>
-typename Vector<Item>::Iterator Vector<Item>::Iterator::operator-=(int x) {
+typename Vector<Item>::Iterator Vector<Item>::Iterator::operator-=(ptrdiff_t x) {
     this->buffer -= x;
 
     return *this;
@@ -612,22 +629,41 @@ typename Vector<Item>::Iterator Vector<Item>::Iterator::operator-=(int x) {
 
 template <typename Item>
 Item& Vector<Item>::Iterator::operator*() {
-    return *buffer;
+    return *this->buffer;
 }
 
 template <typename Item>
 Item* Vector<Item>::Iterator::operator->() {
-    return buffer;
+    return this->buffer;
 }
 
 template <typename Item>
 bool Vector<Item>::Iterator::operator==(const Iterator &iterator) const {
-    return buffer == iterator.buffer;
+    return this->buffer == iterator.buffer;
 }
 
 template <typename Item>
 bool Vector<Item>::Iterator::operator!=(const Iterator &iterator) const {
-    return buffer != iterator.buffer;
+    return this->buffer != iterator.buffer;
+}
+
+template <typename Item>
+bool Vector<Item>::Iterator::operator<(const Iterator &iterator) const {
+    return (*this - iterator < 0) ? true : false;
+}
+
+template <typename Item>
+bool Vector<Item>::Iterator::operator>(const Iterator &iterator) const {
+    return (*this - iterator > 0) ? true : false;
+}
+
+template <typename Item>
+bool Vector<Item>::Iterator::operator<=(const Iterator &iterator) const {
+    return (*this - iterator <= 0) ? true : false;
+}
+template <typename Item>
+bool Vector<Item>::Iterator::operator>=(const Iterator &iterator) const {
+    return (*this - iterator >= 0) ? true : false;
 }
 
 template <typename Item>
@@ -693,7 +729,7 @@ typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator--(int
 }
 
 template <typename Item>
-typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator+(int x) {
+typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator+(ptrdiff_t x) {
     auto iterator = *this;
 
     iterator.buffer += x;
@@ -702,7 +738,7 @@ typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator+(int 
 }
 
 template <typename Item>
-typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator-(int x) {
+typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator-(ptrdiff_t x) {
     auto iterator = *this;
 
     iterator.buffer -= x;
@@ -711,19 +747,19 @@ typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator-(int 
 }
 
 template <typename Item>
-ptrdiff_t Vector<Item>::ConstIterator::operator-(const typename Vector<Item>::ConstIterator& iterator) {
+ptrdiff_t Vector<Item>::ConstIterator::operator-(const typename Vector<Item>::ConstIterator& iterator) const {
     return this->buffer - iterator.buffer;
 }
 
 template <typename Item>
-typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator+=(int x) {
+typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator+=(ptrdiff_t x) {
     this->buffer += x;
 
     return *this;
 }
 
 template <typename Item>
-typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator-=(int x) {
+typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator-=(ptrdiff_t x) {
     this->buffer -= x;
 
     return *this;
@@ -731,31 +767,40 @@ typename Vector<Item>::ConstIterator Vector<Item>::ConstIterator::operator-=(int
 
 template <typename Item>
 const Item& Vector<Item>::ConstIterator::operator*() const {
-    return *buffer;
+    return *this->buffer;
 }
 
 template <typename Item>
 const Item* Vector<Item>::ConstIterator::operator->() const {
-    return buffer;
+    return this->buffer;
 }
 
 template <typename Item>
 bool Vector<Item>::ConstIterator::operator==(const ConstIterator &iterator) const {
-    return buffer == iterator.buffer;
+    return this->buffer == iterator.buffer;
 }
 
 template <typename Item>
 bool Vector<Item>::ConstIterator::operator!=(const ConstIterator &iterator) const {
-    return buffer != iterator.buffer;
+    return this->buffer != iterator.buffer;
 }
 
 template <typename Item>
-typename Vector<Item>::Iterator Vector<Item>::find(const Item &item) {
-    auto it = this->begin();
-
-    for ( ; it != this->end() && *it != item; it++)
-
-    return it;
+bool Vector<Item>::ConstIterator::operator<(const ConstIterator &iterator) const {
+    return (*this - iterator < 0) ? true : false;
 }
 
-#endif
+template <typename Item>
+bool Vector<Item>::ConstIterator::operator>(const ConstIterator &iterator) const {
+    return (*this - iterator > 0) ? true : false;
+}
+
+template <typename Item>
+bool Vector<Item>::ConstIterator::operator<=(const ConstIterator &iterator) const {
+    return (*this - iterator <= 0) ? true : false;
+}
+template <typename Item>
+bool Vector<Item>::ConstIterator::operator>=(const ConstIterator &iterator) const {
+    return (*this - iterator >= 0) ? true : false;
+}
+
