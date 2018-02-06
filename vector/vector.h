@@ -395,10 +395,15 @@ void Vector<ItemType>::insert(typename Vector<ItemType>::Iterator position, Iter
 
 template <typename ItemType>
 typename Vector<ItemType>::Iterator Vector<ItemType>::erase(typename Vector<ItemType>::Iterator position) {
-    for (auto it = position; it != this->end() - 1; it++)
+    ptrdiff_t relative_position = position - this->begin();
+
+    for (auto it = position; it < this->end() - 1; it++)
         *it = *(it + 1);
 
     this->size_--;
+
+    if (this->alloc_memory_if_needed() == true)
+        return position + relative_position;
 
     return position;
 }
@@ -407,7 +412,7 @@ template <typename ItemType>
 void Vector<ItemType>::erase(typename Vector<ItemType>::Iterator first, typename Vector<ItemType>::Iterator last) {
     auto position = first;
 
-    while (position != last)
+    for (auto it = first; it < last; it++)
         position = this->erase(position);
 }
 
