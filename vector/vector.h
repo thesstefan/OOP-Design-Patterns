@@ -89,7 +89,8 @@ class Vector {
 
         class Compare {
             public:
-                ptrdiff_t execute(ConstIterator first_1, ConstIterator end_1, ConstIterator first_2, ConstIterator end_2);
+                template <typename IteratorType>
+                int execute(IteratorType first_1, IteratorType end_1, IteratorType first_2, IteratorType end_2);
         };
 
         Vector();
@@ -133,7 +134,7 @@ class Vector {
         ConstIterator cend() const;
 
         bool alloc_memory_if_needed();
-        void reserve(size_t capacity, bool copy);
+        void reserve(size_t capacity);
 
         Iterator find(const ItemType &item);
 
@@ -311,16 +312,14 @@ size_t Vector<ItemType>::capacity() const {
 }
 
 template <typename ItemType>
-void Vector<ItemType>::reserve(size_t capacity, bool copy) {
+void Vector<ItemType>::reserve(size_t capacity) {
     ItemType *new_buffer = new ItemType[capacity];
 
     if (new_buffer == nullptr) 
         throw std::bad_alloc();
 
-    if (copy) {
-        for (size_t index = 0; index < this->size_; index++)
-            new_buffer[index] = this->buffer[index];
-    }
+    for (size_t index = 0; index < this->size_; index++)
+        new_buffer[index] = this->buffer[index];
 
     delete[] this->buffer;
 
@@ -333,9 +332,9 @@ template <typename ItemType>
 bool Vector<ItemType>::alloc_memory_if_needed()  {
     if (this->size_ == this->capacity_) {
         if (this->capacity_ == 0)
-            reserve(1, false);
+            this->reserve(1);
         else
-            reserve(this->capacity_ * 2, true);
+            this->reserve(this->capacity_ * 2);
 
         return true;
     }
@@ -362,12 +361,6 @@ void Vector<ItemType>::clear() {
 
 template <typename ItemType>
 typename Vector<ItemType>::Iterator Vector<ItemType>::insert(typename Vector<ItemType>::Iterator position, const ItemType& value) {
-    if (this->empty()) {
-        this->push_back(value);
-
-        return this->begin();
-    }
-
     this->alloc_memory_if_needed();
     this->size_++;
 
@@ -479,7 +472,8 @@ bool Vector<ItemType>::operator!=(const Vector &other) const {
 }
 
 template <typename ItemType>
-ptrdiff_t Vector<ItemType>::Compare::execute(typename Vector<ItemType>::ConstIterator first_1, typename Vector<ItemType>::ConstIterator end_1, typename Vector<ItemType>::ConstIterator first_2, typename Vector<ItemType>::ConstIterator end_2) {
+template <typename IteratorType>
+int Vector<ItemType>::Compare::execute(IteratorType first_1, IteratorType end_1, IteratorType first_2, IteratorType end_2) {
     auto it_1 = first_1;
     auto it_2 = first_2;
 
