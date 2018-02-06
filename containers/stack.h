@@ -2,7 +2,7 @@
 
 #include "vector.h"
 
-template <typename ItemType, typename ContainerType = Vector<Type>>
+template <typename ItemType, typename ContainerType = Vector<ItemType>>
 class Stack {
     private:
         ContainerType container;
@@ -39,7 +39,7 @@ template <typename ItemType, typename ContainerType>
 Stack<ItemType, ContainerType>::~Stack() {}
 
 template <typename ItemType, typename ContainerType>
-Stack<ItemType, ContainerType>& Stack<Type, Container>::operator=(const Stack<Type, Container>& other) {
+Stack<ItemType, ContainerType>& Stack<ItemType, ContainerType>::operator=(const Stack<ItemType, ContainerType>& other) {
     this->container = ContainerType(other.container);
 
     return *this;
@@ -56,7 +56,7 @@ size_t Stack<ItemType, ContainerType>::size() const {
 }
 
 template <typename ItemType, typename ContainerType>
-void Stack<ItemType, ContainerType>::push(const Type& value) {
+void Stack<ItemType, ContainerType>::push(const ItemType& value) {
     this->container.push_back(value);
 }
 
