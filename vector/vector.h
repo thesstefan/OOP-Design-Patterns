@@ -37,6 +37,8 @@ class Vector {
                 Item &operator*();
                 Item *operator->();
 
+                Item &operator[](ptrdiff_t index) const;
+
                 bool operator==(const Iterator &iterator) const;
                 bool operator!=(const Iterator &iterator) const;
 
@@ -73,6 +75,8 @@ class Vector {
 
                 const Item &operator*() const;
                 const Item *operator->() const;
+
+                const Item &operator[](ptrdiff_t index) const;
 
                 bool operator==(const ConstIterator &iterator) const;
                 bool operator!=(const ConstIterator &iterator) const;
@@ -638,6 +642,11 @@ Item* Vector<Item>::Iterator::operator->() {
 }
 
 template <typename Item>
+Item& Vector<Item>::Iterator::operator[](ptrdiff_t index) const {
+    return *(this->buffer + index);
+}
+
+template <typename Item>
 bool Vector<Item>::Iterator::operator==(const Iterator &iterator) const {
     return this->buffer == iterator.buffer;
 }
@@ -771,6 +780,11 @@ const Item& Vector<Item>::ConstIterator::operator*() const {
 }
 
 template <typename Item>
+const Item& Vector<Item>::ConstIterator::operator[](ptrdiff_t index) const {
+    return *(this->buffer + index);
+}
+
+template <typename Item>
 const Item* Vector<Item>::ConstIterator::operator->() const {
     return this->buffer;
 }
@@ -803,4 +817,3 @@ template <typename Item>
 bool Vector<Item>::ConstIterator::operator>=(const ConstIterator &iterator) const {
     return (*this - iterator >= 0) ? true : false;
 }
-
