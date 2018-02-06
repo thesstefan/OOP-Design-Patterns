@@ -2,11 +2,13 @@
 
 template <typename ItemType>
 class Vector {
-    protected:
+    private:
         size_t size_;
         size_t capacity_;
 
         ItemType *buffer;
+
+        bool alloc_memory_if_needed();
 
     public:
         class Iterator {
@@ -133,7 +135,6 @@ class Vector {
         ConstIterator cbegin() const;
         ConstIterator cend() const;
 
-        bool alloc_memory_if_needed();
         void reserve(size_t capacity);
 
         Iterator find(const ItemType &item);
