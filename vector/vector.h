@@ -363,11 +363,8 @@ template <typename ItemType>
 typename Vector<ItemType>::Iterator Vector<ItemType>::insert(typename Vector<ItemType>::Iterator position, const ItemType& value) {
     ptrdiff_t relative_position = position - this->begin();
 
-    if (this->alloc_memory_if_needed() == true) {
+    if (this->alloc_memory_if_needed() == true)
         position = this->begin() + relative_position;
-
-        std::cout << "INSERT ALLOC" << std::endl;
-    }
 
     this->size_++;
 
