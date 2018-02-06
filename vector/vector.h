@@ -361,10 +361,17 @@ void Vector<ItemType>::clear() {
 
 template <typename ItemType>
 typename Vector<ItemType>::Iterator Vector<ItemType>::insert(typename Vector<ItemType>::Iterator position, const ItemType& value) {
-    this->alloc_memory_if_needed();
+    ptrdiff_t relative_position = position - this->begin();
+
+    if (this->alloc_memory_if_needed() == true) {
+        position = this->begin() + relative_position;
+
+        std::cout << "INSERT ALLOC" << std::endl;
+    }
+
     this->size_++;
 
-    for (auto it = this->end() - 1; it != position; it--) {
+    for (auto it = this->end() - 1; it > position; it--) {
         *it = *(it - 1);
     }
 
@@ -375,20 +382,14 @@ typename Vector<ItemType>::Iterator Vector<ItemType>::insert(typename Vector<Ite
 
 template <typename ItemType>
 void Vector<ItemType>::insert(typename Vector<ItemType>::Iterator position, size_t count, const ItemType& value) {
-    while (count) {
-        if (this->empty() && position == nullptr)
-            position = this->insert(position, value);
-        else
-            this->insert(position, value);
-
-        count--;
-    }
+    while (count--)
+        position = this->insert(position, value);
 }
 
 template <typename ItemType>
 template <typename IteratorType>
 void Vector<ItemType>::insert(typename Vector<ItemType>::Iterator position, IteratorType first, IteratorType last) {
-    for (auto it = first; it != last; it++)
+    for (auto it = last - 1; it >= first; it--)
         position = this->insert(position, *it);
 }
 
