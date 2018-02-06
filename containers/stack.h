@@ -1,11 +1,11 @@
+#pragma once
+
 #include "vector.h"
 
-typedef unsigned int size_type;
-
-template <typename Type, typename Container = Vector<Type>>
+template <typename ItemType, typename ContainerType = Vector<Type>>
 class Stack {
     private:
-        Container container;
+        ContainerType container;
 
     public:
         Stack();
@@ -13,64 +13,64 @@ class Stack {
 
         ~Stack();
 
-        Stack& operator=(const Stack<Type, Container>& other);
+        Stack& operator=(const Stack<ItemType, ContainerType>& other);
 
         bool empty() const;
-        size_type size() const;
+        size_t size() const;
 
-        void push(const Type& value);
+        void push(const ItemType& value);
         void pop();
 
-        Type& top();
-        const Type& top() const;
+        ItemType& top();
+        const ItemType& top() const;
 };
 
-template <typename Type, typename Container>
-Stack<Type, Container>::Stack() {
-    this->container = Container();
+template <typename ItemType, typename ContainerType>
+Stack<ItemType, ContainerType>::Stack() {
+    this->container = ContainerType();
 }
 
-template <typename Type, typename Container>
-Stack<Type, Container>::Stack(const Stack& other) {
-    this->container = Container(other.container);
+template <typename ItemType, typename ContainerType>
+Stack<ItemType, ContainerType>::Stack(const Stack& other) {
+    this->container = ContainerType(other.container);
 }
 
-template <typename Type, typename Container>
-Stack<Type, Container>::~Stack() {}
+template <typename ItemType, typename ContainerType>
+Stack<ItemType, ContainerType>::~Stack() {}
 
-template <typename Type, typename Container>
-Stack<Type, Container>& Stack<Type, Container>::operator=(const Stack<Type, Container>& other) {
-    this->container = Container(other.container);
+template <typename ItemType, typename ContainerType>
+Stack<ItemType, ContainerType>& Stack<Type, Container>::operator=(const Stack<Type, Container>& other) {
+    this->container = ContainerType(other.container);
 
     return *this;
 }
 
-template <typename Type, typename Container>
-bool Stack<Type, Container>::empty() const {
+template <typename ItemType, typename ContainerType>
+bool Stack<ItemType, ContainerType>::empty() const {
     return this->container.empty();
 }
 
-template <typename Type, typename Container>
-size_type Stack<Type, Container>::size() const {
+template <typename ItemType, typename ContainerType>
+size_t Stack<ItemType, ContainerType>::size() const {
     return this->container.size();
 }
 
-template <typename Type, typename Container>
-void Stack<Type, Container>::push(const Type& value) {
+template <typename ItemType, typename ContainerType>
+void Stack<ItemType, ContainerType>::push(const Type& value) {
     this->container.push_back(value);
 }
 
-template <typename Type, typename Container>
-void Stack<Type, Container>::pop() {
+template <typename ItemType, typename ContainerType>
+void Stack<ItemType, ContainerType>::pop() {
     this->container.pop_back();
 }
 
-template <typename Type, typename Container>
-Type& Stack<Type, Container>::top() {
+template <typename ItemType, typename ContainerType>
+ItemType& Stack<ItemType, ContainerType>::top() {
     return this->container.back();
 }
 
-template <typename Type, typename Container>
-const Type& Stack<Type, Container>::top() const {
+template <typename ItemType, typename ContainerType>
+const ItemType& Stack<ItemType, ContainerType>::top() const {
     return this->container.back();
 }
