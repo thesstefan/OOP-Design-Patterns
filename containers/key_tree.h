@@ -27,8 +27,8 @@ class KeyTree {
 
         Node *real_search(Node *leaf, const KeyType& key) const;
 
-        Node *min(Node *leaf) const;
-        Node *max(Node *leaf) const;
+//        Node *min(Node *leaf) const;
+//        Node *max(Node *leaf) const;
 
         void real_print(Node *leaf) const;
 
@@ -198,7 +198,7 @@ void KeyTree<KeyType, ValueType>::insert(const KeyType &key, const ValueType &va
 }
 
 template <typename KeyType, typename ValueType>
-typename KeyTree<KeyType, ValueType>::Node* KeyTree<KeyType, ValueType>::min(KeyTree<KeyType, ValueType>::Node *leaf) const {
+typename KeyTree<KeyType, ValueType>::Node* min(typename KeyTree<KeyType, ValueType>::Node *leaf) {
     if (leaf == nullptr)
         return nullptr;
     else if (leaf->left == nullptr)
@@ -208,7 +208,7 @@ typename KeyTree<KeyType, ValueType>::Node* KeyTree<KeyType, ValueType>::min(Key
 }
 
 template <typename KeyType, typename ValueType>
-typename KeyTree<KeyType, ValueType>::Node* KeyTree<KeyType, ValueType>::max(KeyTree<KeyType, ValueType>::Node *leaf) const {
+typename KeyTree<KeyType, ValueType>::Node* max(typename KeyTree<KeyType, ValueType>::Node *leaf) {
     if (leaf == nullptr)
         return nullptr;
     else if (leaf->right == nullptr)
@@ -442,7 +442,7 @@ bool KeyTree<KeyType, ValueType>::Iterator::operator!=(const Iterator& iterator)
 
 template <typename KeyType, typename ValueType>
 typename KeyTree<KeyType, ValueType>::Iterator KeyTree<KeyType, ValueType>::begin() {
-    return KeyTree<KeyType, ValueType>::Iterator(this->min(this->root));
+    return KeyTree<KeyType, ValueType>::Iterator(min(this->root));
 }
 
 template <typename KeyType, typename ValueType>
@@ -568,7 +568,7 @@ bool KeyTree<KeyType, ValueType>::ConstIterator::operator!=(const ConstIterator&
 
 template <typename KeyType, typename ValueType>
 typename KeyTree<KeyType, ValueType>::ConstIterator KeyTree<KeyType, ValueType>::cbegin() const {
-    return KeyTree<KeyType, ValueType>::ConstIterator(this->min(this->root));
+    return KeyTree<KeyType, ValueType>::ConstIterator(min(this->root));
 }
 
 template <typename KeyType, typename ValueType>
