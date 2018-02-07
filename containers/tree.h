@@ -15,6 +15,8 @@ class Tree {
                 Node();
                 Node(ItemType value);
                 Node(ItemType value, Node *parent);
+
+//                ~Node();
         };
 
         Node *root;
@@ -132,8 +134,8 @@ typename Tree<ItemType>::Iterator Tree<ItemType>::Iterator::operator++(int) {
 
 template <typename ItemType>
 void Tree<ItemType>::Iterator::decrement() {
-    if (this->current->parent->parent == this->current->node)
-        this->current->node = this->current->right;
+    if (this->current->parent->parent == this->current)
+        this->current = this->current->right;
     else if (this->current->left != nullptr) {
         auto node = this->current->left;
 
@@ -229,6 +231,18 @@ Tree<ItemType>::Node::Node(ItemType value, Node* parent) {
     this->right = nullptr;
 }
 
+/*
+template <typename ItemType>
+Tree<ItemType>::Node::~Node() {
+    if (this != nullptr)
+        if (this->parent != nullptr)
+            if (this->parent->left != nullptr)
+                this->parent->left = nullptr;
+            else
+                this->parent->right = nullptr;
+}
+*/
+
 template <typename ItemType>
 Tree<ItemType>::Tree() {
     this->root = nullptr;
@@ -294,20 +308,39 @@ typename Tree<ItemType>::Node* Tree<ItemType>::real_erase(Tree<ItemType>::Node *
         leaf->left = real_erase(leaf->left, value);
     else if (value > leaf->value)
         leaf->right = real_erase(leaf->right, value);
-    else if (leaf->left && leaf->right) {
-        auto temp = min(leaf->right);
+    else if (leaf->left == nullptr && leaf->right == nullptr) {
+        delete leaf;
+
+        leaf = nullptr;
+    } else if (leaf->right == nullptr) {
+        auto parent = leaf->parent;
+        auto left = leaf->left;
+
+        delete leaf;
+
+        leaf = left;
+        leaf->parent = parent;
+    } else if (leaf->left == nullptr) {
+        auto parent = leaf->parent;
+        auto right = leaf->right;
+
+        delete leaf;
+
+        leaf = right;
+        leaf->parent = parent;
+    } else {
+        auto temp = max(leaf->left);
+        auto parent = temp->parent;
 
         leaf->value = temp->value;
-        leaf->right = real_erase(leaf->right, leaf->value);
-    } else {
-        auto temp = leaf;
 
-        if (leaf->left == nullptr)
-            leaf = leaf->right;
-        else if (leaf->right == nullptr)
-            leaf = leaf->left;
+        if (parent != leaf)
+            parent->right = temp->left;
+        else
+            leaf->left = temp->left;
 
         delete temp;
+        temp = nullptr;
     }
 
     return leaf;
@@ -339,10 +372,28 @@ void Tree<ItemType>::real_print(Tree<ItemType>::Node *leaf) {
     if (leaf != nullptr) {
         real_print(leaf->left);
 
+        std::cout << leaf->value << std::endl;
+
         if (leaf->parent != nullptr)
-            std::cout << leaf->value << " -> " << leaf->parent->value << std::endl;
+            std::cout << "PARENT -> " << leaf->parent->value << std::endl;
         else 
-            std::cout << leaf->value << std::endl;
+            std::cout << "ROOT" << std::endl;
+
+        std::cout << "LEFT -> ";
+
+        if (leaf->left != nullptr)
+            std::cout << leaf->left->value << std::endl;
+        else 
+            std::cout << "NOTHING" << std::endl;
+
+        std::cout << "RIGHT -> ";
+
+        if (leaf->right != nullptr)
+            std::cout << leaf->right->value << std::endl;
+        else 
+            std::cout << "NOTHING" << std::endl;
+
+        std::cout << std::endl;
 
         real_print(leaf->right);
     }
