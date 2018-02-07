@@ -13,18 +13,18 @@ class Tree {
                 Node *right;
 
                 Node();
-                Node(ItemType value);
-                Node(ItemType value, Node *parent);
+                Node(const ItemType& value);
+                Node(const ItemType& value, Node *parent);
         };
 
         Node *root;
 
         void real_delete(Node *leaf);
 
-        Node *real_insert(Node *leaf, Node *parent, ItemType value);
-        Node *real_erase(Node *leaf, ItemType value);
+        Node *real_insert(Node *leaf, Node *parent, const ItemType& value);
+        Node *real_erase(Node *leaf, const ItemType& value);
 
-        Node *real_search(Node *leaf, ItemType value) const;
+        Node *real_search(Node *leaf, const ItemType& value) const;
 
         Node *min(Node *leaf) const;
         Node *max(Node *leaf) const;
@@ -93,10 +93,10 @@ class Tree {
 
         ~Tree();
 
-        void insert(ItemType value);
-        void erase(ItemType value);
+        void insert(const ItemType& value);
+        void erase(const ItemType& value);
 
-        Node *search(ItemType value) const;
+        Node *search(const ItemType& value) const;
 
         void print() const;
 
@@ -118,7 +118,7 @@ Tree<ItemType>::Node::Node() {
 }
 
 template <typename ItemType>
-Tree<ItemType>::Node::Node(ItemType value) {
+Tree<ItemType>::Node::Node(const ItemType& value) {
     this->value = value;
 
     this->parent = nullptr;
@@ -128,7 +128,7 @@ Tree<ItemType>::Node::Node(ItemType value) {
 }
 
 template <typename ItemType>
-Tree<ItemType>::Node::Node(ItemType value, Node* parent) {
+Tree<ItemType>::Node::Node(const ItemType& value, Node* parent) {
     this->value = value;
 
     this->parent = parent;
@@ -177,7 +177,7 @@ Tree<ItemType>::~Tree() {
 }
 
 template <typename ItemType>
-typename Tree<ItemType>::Node* Tree<ItemType>::real_insert(Tree<ItemType>::Node *leaf, Tree<ItemType>::Node *parent, ItemType value) {
+typename Tree<ItemType>::Node* Tree<ItemType>::real_insert(Tree<ItemType>::Node *leaf, Tree<ItemType>::Node *parent, const ItemType& value) {
     if (leaf == nullptr)
         leaf = new Node(value, parent);
     else if (value < leaf->value)
@@ -189,7 +189,7 @@ typename Tree<ItemType>::Node* Tree<ItemType>::real_insert(Tree<ItemType>::Node 
 }
 
 template <typename ItemType>
-void Tree<ItemType>::insert(ItemType value) {
+void Tree<ItemType>::insert(const ItemType& value) {
     this->root = this->real_insert(this->root, this->root, value);
 }
 
@@ -214,7 +214,7 @@ typename Tree<ItemType>::Node* Tree<ItemType>::max(Tree<ItemType>::Node *leaf) c
 }
 
 template <typename ItemType>
-typename Tree<ItemType>::Node* Tree<ItemType>::real_erase(Tree<ItemType>::Node *leaf, ItemType value) {
+typename Tree<ItemType>::Node* Tree<ItemType>::real_erase(Tree<ItemType>::Node *leaf, const ItemType &value) {
     if (leaf == nullptr)
         return nullptr;
     else if (value < leaf->value)
@@ -260,12 +260,12 @@ typename Tree<ItemType>::Node* Tree<ItemType>::real_erase(Tree<ItemType>::Node *
 }
 
 template <typename ItemType>
-void Tree<ItemType>::erase(ItemType value) {
+void Tree<ItemType>::erase(const ItemType &value) {
     this->root = this->real_erase(this->root, value);
 }
 
 template <typename ItemType>
-typename Tree<ItemType>::Node* Tree<ItemType>::real_search(Tree<ItemType>::Node *leaf, ItemType value) const {
+typename Tree<ItemType>::Node* Tree<ItemType>::real_search(Tree<ItemType>::Node *leaf, const ItemType &value) const {
     if (leaf == nullptr || leaf->value == value)
         return leaf;
 
@@ -276,7 +276,7 @@ typename Tree<ItemType>::Node* Tree<ItemType>::real_search(Tree<ItemType>::Node 
 }
 
 template <typename ItemType>
-typename Tree<ItemType>::Node* Tree<ItemType>::search(ItemType value) const {
+typename Tree<ItemType>::Node* Tree<ItemType>::search(const ItemType &value) const {
     return this->real_search(this->root, value);
 }
 
