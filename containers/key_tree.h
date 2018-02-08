@@ -19,8 +19,8 @@ class KeyTree {
                 Node *right;
 
                 Node();
-                Node(const KeyType &key, const ValueType &value);
-                Node(const KeyType &key, const ValueType &value, Node *parent);
+                Node(const KeyType& key, const ValueType& value);
+                Node(const KeyType& key, const ValueType& value, Node *parent);
         };
 
         Node *root;
@@ -50,9 +50,9 @@ class KeyTree {
             public:
                 Iterator();
                 Iterator(Node *node, Node *max);
-                Iterator(const Iterator &iterator);
+                Iterator(const Iterator& iterator);
 
-                Iterator& operator=(const Iterator &iterator);
+                Iterator& operator=(const Iterator& iterator);
 
                 Iterator operator++();
                 Iterator operator++(int);
@@ -63,8 +63,8 @@ class KeyTree {
                 Node &operator*();
                 Node *operator->();
 
-                bool operator==(const Iterator &iterator) const;
-                bool operator!=(const Iterator &iterator) const;
+                bool operator==(const Iterator& iterator) const;
+                bool operator!=(const Iterator& iterator) const;
         };
 
         class ConstIterator {
@@ -78,9 +78,9 @@ class KeyTree {
             public:
                 ConstIterator();
                 ConstIterator(Node *node, Node *max);
-                ConstIterator(const ConstIterator &iterator);
+                ConstIterator(const ConstIterator& iterator);
 
-                ConstIterator& operator=(const ConstIterator &iterator);
+                ConstIterator& operator=(const ConstIterator& iterator);
 
                 ConstIterator operator++();
                 ConstIterator operator++(int);
@@ -91,8 +91,8 @@ class KeyTree {
                 const Node &operator*() const;
                 const Node *operator->() const;
 
-                bool operator==(const ConstIterator &iterator) const;
-                bool operator!=(const ConstIterator &iterator) const;
+                bool operator==(const ConstIterator& iterator) const;
+                bool operator!=(const ConstIterator& iterator) const;
         };
 
         KeyTree();
@@ -102,10 +102,10 @@ class KeyTree {
 
         ~KeyTree();
 
-        void insert(const KeyType &key, const ValueType &value);
-        void erase(const KeyType &key);
+        void insert(const KeyType& key, const ValueType& value);
+        void erase(const KeyType& key);
 
-        Node *search(const KeyType &key) const;
+        Node *search(const KeyType& key) const;
 
         void print() const;
 
@@ -212,7 +212,7 @@ typename KeyTree<KeyType, ValueType, Compare>::Node* KeyTree<KeyType, ValueType,
 }
 
 template <typename KeyType, typename ValueType, typename Compare>
-void KeyTree<KeyType, ValueType, Compare>::insert(const KeyType &key, const ValueType &value) {
+void KeyTree<KeyType, ValueType, Compare>::insert(const KeyType& key, const ValueType& value) {
     this->root = this->real_insert(this->root, this->root, key, value);
 }
 
@@ -602,16 +602,6 @@ bool KeyTree<KeyType, ValueType, Compare>::ConstIterator::operator!=(const Const
 }
 
 template <typename KeyType, typename ValueType, typename Compare>
-typename KeyTree<KeyType, ValueType, Compare>::ConstIterator KeyTree<KeyType, ValueType, Compare>::cbegin() const {
-    return KeyTree<KeyType, ValueType, Compare>::ConstIterator(this->min(), this->max());
-}
-
-template <typename KeyType, typename ValueType, typename Compare>
-typename KeyTree<KeyType, ValueType, Compare>::ConstIterator KeyTree<KeyType, ValueType, Compare>::cend() const {
-    return KeyTree<KeyType, ValueType, Compare>::ConstIterator(nullptr, this->max());
-}
-
-template <typename KeyType, typename ValueType, typename Compare>
 typename KeyTree<KeyType, ValueType, Compare>::Node* KeyTree<KeyType, ValueType, Compare>::min() const {
     return min_helper(this->root);
 }
@@ -619,6 +609,16 @@ typename KeyTree<KeyType, ValueType, Compare>::Node* KeyTree<KeyType, ValueType,
 template <typename KeyType, typename ValueType, typename Compare>
 typename KeyTree<KeyType, ValueType, Compare>::Node* KeyTree<KeyType, ValueType, Compare>::max() const {
     return max_helper(this->root);
+}
+
+template <typename KeyType, typename ValueType, typename Compare>
+typename KeyTree<KeyType, ValueType, Compare>::ConstIterator KeyTree<KeyType, ValueType, Compare>::cbegin() const {
+    return KeyTree<KeyType, ValueType, Compare>::ConstIterator(this->min(), this->max());
+}
+
+template <typename KeyType, typename ValueType, typename Compare>
+typename KeyTree<KeyType, ValueType, Compare>::ConstIterator KeyTree<KeyType, ValueType, Compare>::cend() const {
+    return KeyTree<KeyType, ValueType, Compare>::ConstIterator(nullptr, this->max());
 }
 
 template <typename KeyType, typename ValueType, typename Compare>
