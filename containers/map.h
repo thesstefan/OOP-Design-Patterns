@@ -168,14 +168,14 @@ template <typename Key, typename Value>
 typename Map<Key, Value>::Iterator Map<Key, Value>::insert(const Pair<Key, Value>& pair) {
     this->data.insert(pair->first, pair->second);
 
-    return this->data.search(pair->first);
+    return Map<Key, Value>::Iterator(this->data.search(pair->first), this->data.max());
 }
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::Iterator Map<Key, Value>::insert(const Key& key, const Value& value) {
     this->data.insert(key, value);
 
-    return this->data.search(key);
+    return Map<Key, Value>::Iterator(this->data.search(key), this->data.max());
 }
 
 template <typename Key, typename Value>
@@ -221,17 +221,17 @@ void Map<Key, Value>::swap(const Map<Key, Value>& other) {
 
 template <typename Key, typename Value>
 size_t Map<Key, Value>::count(const Key &key) const {
-    return (this->find(key) != nullptr) ? 1 : 0;
+    return (this->data->search(key) != nullptr) ? 1 : 0;
 }
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::Iterator Map<Key, Value>::find(const Key &key) {
-    return Map<Key, Value>::Iterator(this->find(key));
+    return Map<Key, Value>::Iterator(this->data.search(key), this->data.max());
 }
 
 template <typename Key, typename Value>
 typename Map<Key, Value>::ConstIterator Map<Key, Value>::find(const Key &key) const {
-    return Map<Key, Value>::ConstIterator(this->find(key));
+    return Map<Key, Value>::ConstIterator(this->data.search(key), this->data.max());
 }
 
 template <typename Key, typename Value>
