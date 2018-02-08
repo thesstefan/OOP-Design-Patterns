@@ -1,15 +1,16 @@
 #pragma once
 
-#include "key_tree.h"
 #include "pair.h"
+#include "key_tree.h"
+#include "misc.h"
 
-template <typename Key, typename Value>
+template <typename KeyType, typename ValueType, typename Compare = NodeCompare<KeyType>>
 class Map {
-    typedef typename KeyTree<Key, Value>::Iterator Iterator;
-    typedef typename KeyTree<Key, Value>::ConstIterator ConstIterator;
+    typedef typename KeyTree<KeyType, ValueType, Compare>::Iterator Iterator;
+    typedef typename KeyTree<KeyType, ValueType, Compare>::ConstIterator ConstIterator;
 
     private:
-        KeyTree<Key, Value> data;
+        KeyTree<KeyType, ValueType, Compare> data;
 
     public:
         Map();
@@ -22,10 +23,10 @@ class Map {
 
         Map& operator=(const Map &other); 
 
-        Value& at(const Key& key);
-        const Value& at(const Key& key) const;
+        ValueType& at(const KeyType& key);
+        const ValueType& at(const KeyType& key) const;
 
-        Value& operator[](const Key& key);
+        ValueType& operator[](const KeyType& key);
 
         Iterator begin();
         Iterator end();
@@ -38,167 +39,170 @@ class Map {
 
         void clear();
 
-        Iterator insert(const Pair<Key, Value>& pair);
-        Iterator insert(const Key& key, const Value& value);
+        Iterator insert(const Pair<KeyType, ValueType>& pair);
+        Iterator insert(const KeyType& key, const ValueType& value);
 
         template <typename IteratorType>
         void insert(IteratorType first, IteratorType last);
 
         void erase(Iterator position);
-        size_t erase(const Key& key);
+        size_t erase(const KeyType& key);
 
         template <typename IteratorType>
         void erase(IteratorType first, IteratorType last);
 
-        void swap(const Map<Key, Value>& other);
+        void swap(const Map<KeyType, ValueType, Compare>& other);
 
-        size_t count (const Key &key) const;
+        size_t count (const KeyType &key) const;
 
-        Iterator find(const Key &key);
-        ConstIterator find(const Key &key) const;
+        Iterator find(const KeyType &key);
+        ConstIterator find(const KeyType &key) const;
 
-        Iterator lower_bound(const Key &key);
-        ConstIterator lower_bound(const Key &key) const;
+        Iterator lower_bound(const KeyType &key);
+        ConstIterator lower_bound(const KeyType &key) const;
 
-        Iterator upper_bound(const Key &key);
-        ConstIterator upper_bound(const Key &key) const;
+        Iterator upper_bound(const KeyType &key);
+        ConstIterator upper_bound(const KeyType &key) const;
 
-        Pair<Iterator, Iterator> equal_range(const Key &key);
-        Pair<ConstIterator, ConstIterator> equal_range(const Key &key) const;
+        Pair<Iterator, Iterator> equal_range(const KeyType &key);
+        Pair<ConstIterator, ConstIterator> equal_range(const KeyType &key) const;
+
+        bool operator==(const Map& other) const;
+        bool operator!=(const Map& other) const;
+
+        bool operator<(const Map& other) const;
+        bool operator>(const Map& other) const;
+        bool operator<=(const Map& other) const;
+        bool operator>=(const Map& other) const;
 };
 
-template <typename Key, typename Value>
-Map<Key, Value>::Map() {
-    this->data = KeyTree<Key, Value>();
+template <typename KeyType, typename ValueType, typename Compare>
+Map<KeyType, ValueType, Compare>::Map() {
+    this->data = KeyTree<KeyType, ValueType>();
 }
 
-template <typename Key, typename Value>
+template <typename KeyType, typename ValueType, typename Compare>
 template <typename IteratorType>
-Map<Key, Value>::Map(IteratorType first, IteratorType last) {
-    this->data = KeyTree<Key, Value>();
+Map<KeyType, ValueType, Compare>::Map(IteratorType first, IteratorType last) {
+    this->data = KeyTree<KeyType, ValueType>();
 
     for (auto it = first; it != last; it++)
         this->data.insert(*it);
 }
 
-template <typename Key, typename Value>
-Map<Key, Value>::Map(const Map& other) {
+template <typename KeyType, typename ValueType, typename Compare>
+Map<KeyType, ValueType, Compare>::Map(const Map& other) {
     this->data = other.data;
 }
 
-template <typename Key, typename Value>
-Map<Key, Value>::~Map() {}
+template <typename KeyType, typename ValueType, typename Compare>
+Map<KeyType, ValueType, Compare>::~Map() {}
 
-template <typename Key, typename Value>
-Map<Key, Value>& Map<Key, Value>::operator=(const Map& other) {
+template <typename KeyType, typename ValueType, typename Compare>
+Map<KeyType, ValueType, Compare>& Map<KeyType, ValueType, Compare>::operator=(const Map& other) {
     this->data = other.data;
 }
 
-template <typename Key, typename Value>
-Value& Map<Key, Value>::at(const Key &key) {
+template <typename KeyType, typename ValueType, typename Compare>
+ValueType& Map<KeyType, ValueType, Compare>::at(const KeyType &key) {
     auto result = this->data.search(key);
 
     if (result == nullptr)
-        throw std::out_of_range("Key is not present in Map (Map::at(const KeyType &key))");
+        throw std::out_of_range("KeyType is not present in Map (Map::at(const KeyType &key))");
 
     return result->value;
 }
 
-template <typename Key, typename Value>
-const Value& Map<Key, Value>::at(const Key &key) const {
+template <typename KeyType, typename ValueType, typename Compare>
+const ValueType& Map<KeyType, ValueType, Compare>::at(const KeyType &key) const {
     auto result = this->data.search(key);
 
     if (result == nullptr)
-        throw std::out_of_range("Key is not present in Map (Map::at(const KeyType &key))");
+        throw std::out_of_range("KeyType is not present in Map (Map::at(const KeyType &key))");
 
     return result->value;
 }
 
-template <typename Key, typename Value>
-Value& Map<Key, Value>::operator[](const Key &key) {
-    return (this->data.search(key))->value;
+template <typename KeyType, typename ValueType, typename Compare>
+ValueType& Map<KeyType, ValueType, Compare>::operator[](const KeyType &key) {
+    auto find = this->data.search(key);
+
+    if (find == nullptr)
+        return this->insert(key, ValueType())->value;
+
+    return find->value;
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::begin() {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::Iterator Map<KeyType, ValueType, Compare>::begin() {
     return this->data.begin();
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::end() {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::Iterator Map<KeyType, ValueType, Compare>::end() {
     return this->data.end();
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::cbegin() const {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::ConstIterator Map<KeyType, ValueType, Compare>::cbegin() const {
     return this->data.cbegin();
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::cend() const {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::ConstIterator Map<KeyType, ValueType, Compare>::cend() const {
     return this->data.cend();
 }
 
-template <typename Key, typename Value>
-bool Map<Key, Value>::empty() const {
-    return this->data.begin() == this->data.end();
+template <typename KeyType, typename ValueType, typename Compare>
+bool Map<KeyType, ValueType, Compare>::empty() const {
+    return this->data.cbegin() == this->data.cend();
 }
 
-template <typename IteratorType>
-ptrdiff_t distance(IteratorType first, IteratorType second) {
-    ptrdiff_t distance = 0;
-
-    for (auto it = first; it != second; it++, distance++);
-
-    return ++distance;
-}
-
-template <typename Key, typename Value>
-size_t Map<Key, Value>::size() const {
+template <typename KeyType, typename ValueType, typename Compare>
+size_t Map<KeyType, ValueType, Compare>::size() const {
     return distance(this->data.cbegin(), this->data.cend());
 }
 
-template <typename Key, typename Value>
-void Map<Key, Value>::clear() {
-    for (auto it = this->data.begin(); it != this->data.end(); it++)
-        this->data.erase(it->key);
+template <typename KeyType, typename ValueType, typename Compare>
+void Map<KeyType, ValueType, Compare>::clear() {
+    this->erase(this->begin(), this->end());
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::insert(const Pair<Key, Value>& pair) {
-    this->data.insert(pair->first, pair->second);
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::Iterator Map<KeyType, ValueType, Compare>::insert(const Pair<KeyType, ValueType>& pair) {
+    this->data.insert(pair.first, pair.second);
 
-    return Map<Key, Value>::Iterator(this->data.search(pair->first), this->data.max());
+    return Map<KeyType, ValueType, Compare>::Iterator(this->data.search(pair.first), this->data.max());
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::insert(const Key& key, const Value& value) {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::Iterator Map<KeyType, ValueType, Compare>::insert(const KeyType& key, const ValueType& value) {
     this->data.insert(key, value);
 
-    return Map<Key, Value>::Iterator(this->data.search(key), this->data.max());
+    return Map<KeyType, ValueType, Compare>::Iterator(this->data.search(key), this->data.max());
 }
 
-template <typename Key, typename Value>
+template <typename KeyType, typename ValueType, typename Compare>
 template <typename IteratorType>
-void Map<Key, Value>::insert(IteratorType first, IteratorType last) {
+void Map<KeyType, ValueType, Compare>::insert(IteratorType first, IteratorType last) {
     for (auto it = first; it != last; it++)
-        this->data.insert(*it);
+        this->data.insert(it->key, it->value);
 }
 
-template <typename Key, typename Value>
-void Map<Key, Value>::erase(typename Map<Key, Value>::Iterator position) {
+template <typename KeyType, typename ValueType, typename Compare>
+void Map<KeyType, ValueType, Compare>::erase(typename Map<KeyType, ValueType, Compare>::Iterator position) {
     this->data.erase(position->key);
 }
 
-template <typename Key, typename Value>
+template <typename KeyType, typename ValueType, typename Compare>
 template <typename IteratorType>
-void Map<Key, Value>::erase(IteratorType first, IteratorType last) {
+void Map<KeyType, ValueType, Compare>::erase(IteratorType first, IteratorType last) {
     for (auto it = first; it != last; it++)
         this->data.erase(it->key);
 }
 
-template <typename Key, typename Value>
-size_t Map<Key, Value>::erase(const Key &key) {
+template <typename KeyType, typename ValueType, typename Compare>
+size_t Map<KeyType, ValueType, Compare>::erase(const KeyType &key) {
     size_t count = 0;
 
     while (this->data.search(key) != nullptr) {
@@ -210,72 +214,104 @@ size_t Map<Key, Value>::erase(const Key &key) {
     return count;
 }
 
-template <typename Key, typename Value>
-void Map<Key, Value>::swap(const Map<Key, Value>& other) {
+/*
+template <typename KeyType, typename ValueType, typename Compare>
+void Map<KeyType, ValueType, Compare>::swap(const Map<KeyType, ValueType, Compare>& other) {
     auto temp = this->data;
 
     this->data = other.data;
 
     other.data = temp;
 }
+*/
 
-template <typename Key, typename Value>
-size_t Map<Key, Value>::count(const Key &key) const {
-    return (this->data->search(key) != nullptr) ? 1 : 0;
+template <typename KeyType, typename ValueType, typename Compare>
+size_t Map<KeyType, ValueType, Compare>::count(const KeyType &key) const {
+    return (this->data.search(key) != nullptr) ? 1 : 0;
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::find(const Key &key) {
-    return Map<Key, Value>::Iterator(this->data.search(key), this->data.max());
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::Iterator Map<KeyType, ValueType, Compare>::find(const KeyType &key) {
+    return Map<KeyType, ValueType, Compare>::Iterator(this->data.search(key), this->data.max());
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::find(const Key &key) const {
-    return Map<Key, Value>::ConstIterator(this->data.search(key), this->data.max());
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::ConstIterator Map<KeyType, ValueType, Compare>::find(const KeyType &key) const {
+    return Map<KeyType, ValueType, Compare>::ConstIterator(this->data.search(key), this->data.max());
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::lower_bound(const Key &key) {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::Iterator Map<KeyType, ValueType, Compare>::lower_bound(const KeyType &key) {
     auto it = this->begin();
 
-    for ( ; it != this->end() && !(key > it->key) ; it++)
+    for ( ; it != this->end() && !(key < it->key); it++);
 
     return it;
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::lower_bound(const Key &key) const {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::ConstIterator Map<KeyType, ValueType, Compare>::lower_bound(const KeyType &key) const {
     auto it = this->cbegin();
 
-    for ( ; it != this->cend() && !(key > it->key) ; it++)
+    for ( ; it != this->cend() && !(key < it->key); it++);
 
     return it;
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::Iterator Map<Key, Value>::upper_bound(const Key &key) {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::Iterator Map<KeyType, ValueType, Compare>::upper_bound(const KeyType &key) {
     auto it = this->begin();
 
-    for ( ; it != this->end() && key >= it->key ; it++)
+    for ( ; it != this->end() && key > it->key ; it++);
 
     return it;
 }
 
-template <typename Key, typename Value>
-typename Map<Key, Value>::ConstIterator Map<Key, Value>::upper_bound(const Key &key) const {
+template <typename KeyType, typename ValueType, typename Compare>
+typename Map<KeyType, ValueType, Compare>::ConstIterator Map<KeyType, ValueType, Compare>::upper_bound(const KeyType &key) const {
     auto it = this->cbegin();
 
-    for ( ; it != this->cend() && key >= it->key ; it++)
+    for ( ; it != this->cend() && key > it->key ; it++);
 
     return it;
 }
 
-template <typename Key, typename Value>
-Pair<typename Map<Key, Value>::Iterator, typename Map<Key, Value>::Iterator> Map<Key, Value>::equal_range(const Key &key) {
-    return Pair<typename Map<Key, Value>::Iterator, typename Map<Key, Value>::Iterator>(this->lower_bound(key), this->upper_bound(key));
+template <typename KeyType, typename ValueType, typename Compare>
+Pair<typename Map<KeyType, ValueType, Compare>::Iterator, typename Map<KeyType, ValueType, Compare>::Iterator> Map<KeyType, ValueType, Compare>::equal_range(const KeyType &key) {
+    return Pair<typename Map<KeyType, ValueType, Compare>::Iterator, typename Map<KeyType, ValueType, Compare>::Iterator>(this->lower_bound(key), this->upper_bound(key));
 }
 
-template <typename Key, typename Value>
-Pair<typename Map<Key, Value>::ConstIterator, typename Map<Key, Value>::ConstIterator> Map<Key, Value>::equal_range(const Key &key) const {
-    return Pair<typename Map<Key, Value>::ConstIterator, typename Map<Key, Value>::ConstIterator>(this->lower_bound(key), this->upper_bound(key));
+template <typename KeyType, typename ValueType, typename Compare>
+Pair<typename Map<KeyType, ValueType, Compare>::ConstIterator, typename Map<KeyType, ValueType, Compare>::ConstIterator> Map<KeyType, ValueType, Compare>::equal_range(const KeyType &key) const {
+    return Pair<typename Map<KeyType, ValueType, Compare>::ConstIterator, typename Map<KeyType, ValueType, Compare>::ConstIterator>(this->lower_bound(key), this->upper_bound(key));
+}
+
+template <typename KeyType, typename ValueType, typename Compare>
+bool Map<KeyType, ValueType, Compare>::operator==(const Map<KeyType, ValueType, Compare>& other) const {
+    return this->data == other.data;
+}
+
+template <typename KeyType, typename ValueType, typename Compare>
+bool Map<KeyType, ValueType, Compare>::operator!=(const Map<KeyType, ValueType, Compare>& other) const {
+    return this->data != other.data;
+}
+
+template <typename KeyType, typename ValueType, typename Compare>
+bool Map<KeyType, ValueType, Compare>::operator<(const Map<KeyType, ValueType, Compare>& other) const {
+    return this->data < other.data;
+}
+
+template <typename KeyType, typename ValueType, typename Compare>
+bool Map<KeyType, ValueType, Compare>::operator>(const Map<KeyType, ValueType, Compare>& other) const {
+    return this->data > other.data;
+}
+
+template <typename KeyType, typename ValueType, typename Compare>
+bool Map<KeyType, ValueType, Compare>::operator<=(const Map<KeyType, ValueType, Compare>& other) const {
+    return this->data < other.data;
+}
+
+template <typename KeyType, typename ValueType, typename Compare>
+bool Map<KeyType, ValueType, Compare>::operator>=(const Map<KeyType, ValueType, Compare>& other) const {
+    return this->data < other.data;
 }
